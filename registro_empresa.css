@@ -117,22 +117,32 @@ form {
     display: flex;
     justify-content: center;
     margin-top: 10px;
+    
 }
 
-.button-container button {
+
+
+
+
+.next-button  {
     padding: 12px 24px;
-    background-color: #00aaff;
+    
     color: #fff;
     border: none;
     border-radius: 25px;
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
+     display: inline-block;
+       text-decoration: none;
 }
 
-.button-container button:hover {
-    background-color: #0088cc;
+.next-button  {
+    background-color: #00aaff;
 }
+
+
+
 
 .back-button {
     position: absolute;

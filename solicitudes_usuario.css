@@ -1,0 +1,66 @@
+/* solicitudes_usuario.css */
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f3f3f3;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color:  #005f73;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+main {
+  padding: 30px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+  background-color: #0a9396;
+  color: white;
+}
+
+thead th, tbody td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+button.aceptar {
+  background-color: #48c60e;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+button.rechazar {
+  background-color: #ff1500;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button.aceptar:hover {
+  background-color: #3c8c2d;
+}
+
+button.rechazar:hover {
+  background-color: #941d10;
+}

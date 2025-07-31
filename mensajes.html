@@ -1,0 +1,51 @@
+<!-- mensajes.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat con Usuario</title>
+  <link rel="stylesheet" href="mensajes.css">
+</head>
+<body>
+  <header>
+    <h1>Chat Privado</h1>
+    <p>Solo disponible si el estudiante aceptó tu solicitud de reclutamiento</p>
+  </header>
+
+  <main class="chat-container">
+    <div class="chat-box" id="chatBox">
+      <div class="mensaje empresa">
+        <p>Hola Juan, gracias por aceptar nuestra solicitud.</p>
+        <span>Empresa · 08:30</span>
+      </div>
+      <div class="mensaje usuario">
+        <p>Con gusto. Estoy disponible para entrevista esta semana.</p>
+        <span>Juan Pérez · 08:35</span>
+      </div>
+    </div>
+
+    <form class="formulario-chat" onsubmit="return enviarMensaje()">
+      <input type="text" id="mensajeInput" placeholder="Escribe un mensaje..." required>
+      <button type="submit">Enviar</button>
+    </form>
+  </main>
+
+  <script>
+    function enviarMensaje() {
+      const input = document.getElementById('mensajeInput');
+      const mensaje = input.value;
+      if (mensaje.trim() === '') return false;
+
+      const chatBox = document.getElementById('chatBox');
+      const nuevo = document.createElement('div');
+      nuevo.classList.add('mensaje', 'empresa');
+      nuevo.innerHTML = `<p>${mensaje}</p><span>Empresa · ahora</span>`;
+      chatBox.appendChild(nuevo);
+      input.value = '';
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return false; // evita recargar
+    }
+  </script>
+</body>
+</html>

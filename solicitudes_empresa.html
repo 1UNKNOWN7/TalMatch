@@ -1,0 +1,70 @@
+<!-- solicitudes_empresa.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solicitudes Enviadas</title>
+  <link rel="stylesheet" href="solicitudes_empresa.css">
+  <link rel="stylesheet" href="global.css">
+</head>
+<body>
+  <header>
+    <h1>Solicitudes Enviadas a Usuarios</h1>
+    <button id="modoOscuroBtn">🌙 Modo Oscuro</button>
+  </header>
+
+  <main>
+    <table>
+      <thead>
+        <tr>
+          <th>Estudiante</th>
+          <th>Carrera</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Juan Pérez</td>
+          <td>Ing. en Sistemas</td>
+          <td>2025-07-28</td>
+          <td>Aceptada</td>
+          <td><a href="mensajes.html" class="verchat">Ver Chat</a></td>
+        </tr>
+        <tr>
+          <td>Lucía Rodríguez</td>
+          <td>Ing. Industrial</td>
+          <td>2025-07-27</td>
+          <td>Pendiente</td>
+          <td><span class="pendiente">Esperando respuesta</span></td>
+        </tr>
+        <!-- Más solicitudes -->
+      </tbody>
+    </table>
+  </main>
+
+
+<!-- FUNICIONALIDAD MODO OSCURO-->    
+    <script>
+  const btnModo = document.getElementById('modoOscuroBtn');
+  const root = document.documentElement;
+
+  // Cargar desde localStorage
+  if (localStorage.getItem('modoOscuro') === 'activo') {
+    document.documentElement.classList.add('dark-mode');
+    btnModo.textContent = '☀️ Modo Claro';
+  }
+
+  btnModo.addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark-mode');
+    const activo = document.documentElement.classList.contains('dark-mode');
+    btnModo.textContent = activo ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+    localStorage.setItem('modoOscuro', activo ? 'activo' : 'inactivo');
+  });
+</script>
+
+
+</body>
+</html>

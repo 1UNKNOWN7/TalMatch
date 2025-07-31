@@ -82,7 +82,7 @@ body {
 }
 
 .login-form input:focus {
-    border-color: #0056b3;
+    border-color: #08488d;
 }
 
 .login-form button {
@@ -310,6 +310,6 @@ body {
 .login-form,
 .register-selection,
 .register-form {
-    border: 4px solid #00BFFF; 
+    border: 4px solid #ffffff; 
     border-radius: 12px;
 }

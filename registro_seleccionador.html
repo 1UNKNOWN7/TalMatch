@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Registro Responsable de Selección</title>
+    <button id="modoOscuroBtn">🌙 Modo Oscuro</button>
+    <link rel="stylesheet" href="global.css">
     <link rel="stylesheet" href="registro_seleccionador.css" />
 </head>
 <body>
@@ -51,5 +53,26 @@
             <img src="imagenes/FLECHA AZUL.PNG" alt="Volver"/>
         </a>
     </div>
+
+
+<script>
+  const btnModo = document.getElementById('modoOscuroBtn');
+  const root = document.documentElement;
+
+  // Cargar desde localStorage
+  if (localStorage.getItem('modoOscuro') === 'activo') {
+    document.documentElement.classList.add('dark-mode');
+    btnModo.textContent = '☀️ Modo Claro';
+  }
+
+  btnModo.addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark-mode');
+    const activo = document.documentElement.classList.contains('dark-mode');
+    btnModo.textContent = activo ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+    localStorage.setItem('modoOscuro', activo ? 'activo' : 'inactivo');
+  });
+</script>
+
+
 </body>
 </html>
