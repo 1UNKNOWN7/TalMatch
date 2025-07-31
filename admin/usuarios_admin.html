@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <title>Usuarios - Admin</title>
   <link rel="stylesheet" href="inicio_admin.css">
+  <link rel="stylesheet" href="modo_oscuro.css">
   <style>
     table {
       width: 100%;
@@ -64,4 +65,25 @@
     </table>
   </main>
 </body>
+
+<!-- FUNICIONALIDAD MODO OSCURO-->    
+    <script>
+  const btnModo = document.getElementById('modoOscuroBtn');
+  const root = document.documentElement;
+
+  // Cargar desde localStorage
+  if (localStorage.getItem('modoOscuro') === 'activo') {
+    document.documentElement.classList.add('dark-mode');
+    btnModo.textContent = '☀️ Modo Claro';
+  }
+
+  btnModo.addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark-mode');
+    const activo = document.documentElement.classList.contains('dark-mode');
+    btnModo.textContent = activo ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+    localStorage.setItem('modoOscuro', activo ? 'activo' : 'inactivo');
+  });
+</script>
+
+
 </html>

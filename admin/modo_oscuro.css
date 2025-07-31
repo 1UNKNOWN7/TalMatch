@@ -1,0 +1,56 @@
+/* global.css */
+
+/* Colores por defecto (modo claro) */
+body {
+  background-color: #f3f3f3;
+  color: #111;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+
+
+/* Estilo del botón */
+#modoOscuroBtn {
+  background: rgb(0, 0, 0);
+  border: 1px solid rgb(0, 38, 255);
+  padding: 8px 16px;
+  color: rgb(255, 255, 255);
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#modoOscuroBtn:hover {
+  background-color: rgb(186, 2, 2);
+}
+
+/* === MODO OSCURO === */
+.dark-mode body {
+  background-color: #8d8b8b;
+  color: #000000;
+}
+
+.dark-mode header {
+  background-color: #000000;
+  color: #eee;
+}
+
+.dark-mode table {
+  background-color: #a8a5a5;
+  color: #000000;
+}
+
+
+/*COLOR DE TEXTO DE LOS BOTONES NEXT EN MODO OSCURO*/
+.dark-mode a {
+  color: #ffffff;
+}
+
+.dark-mode button {
+  background-color: #007BFF !important;
+  
+  /*COLOR DE LOS BOTONES SUMMIT*/
+  color: #ffffff !important;
+  border: 1px solid #666;
+}
+
+

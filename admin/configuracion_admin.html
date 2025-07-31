@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <title>Configuración - Admin</title>
   <link rel="stylesheet" href="inicio_admin.css">
+  <link rel="stylesheet" href="modo_oscuro.css">
   <style>
     form {
       max-width: 500px;
@@ -49,6 +50,7 @@
     <nav>
       <ul>
         <li><a href="inicio_admin.html">Volver al Panel</a></li>
+        <button id="modoOscuroBtn">🌙 Modo Oscuro</button>
       </ul>
     </nav>
   </header>
@@ -67,8 +69,37 @@
       <label for="logo">Cambiar logo (simulado)</label>
       <input type="text" id="logo" name="logo" placeholder="URL del nuevo logo">
 
+
+
+
       <input type="submit" value="Guardar cambios">
     </form>
   </main>
+
+
+  
+<!-- FUNICIONALIDAD MODO OSCURO-->    
+    <script>
+  const btnModo = document.getElementById('modoOscuroBtn');
+  const root = document.documentElement;
+
+  // Cargar desde localStorage
+  if (localStorage.getItem('modoOscuro') === 'activo') {
+    document.documentElement.classList.add('dark-mode');
+    btnModo.textContent = '☀️ Modo Claro';
+  }
+
+  btnModo.addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark-mode');
+    const activo = document.documentElement.classList.contains('dark-mode');
+    btnModo.textContent = activo ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+    localStorage.setItem('modoOscuro', activo ? 'activo' : 'inactivo');
+  });
+</script>
+
+
+
 </body>
+
+
 </html>

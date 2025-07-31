@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TalMatch - Panel de Administración</title>
   <link rel="stylesheet" href="inicio_admin.css">
+  <link rel="stylesheet" href="modo_oscuro.css">
 </head>
 <body>
   <header>
@@ -52,5 +53,27 @@
     <p>&copy; 2025 TalMatch | Plataforma de conexión profesional</p>
   </footer>
 </body>
+
+
+<!-- FUNICIONALIDAD MODO OSCURO-->    
+    <script>
+  const btnModo = document.getElementById('modoOscuroBtn');
+  const root = document.documentElement;
+
+  // Cargar desde localStorage
+  if (localStorage.getItem('modoOscuro') === 'activo') {
+    document.documentElement.classList.add('dark-mode');
+    btnModo.textContent = '☀️ Modo Claro';
+  }
+
+  btnModo.addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark-mode');
+    const activo = document.documentElement.classList.contains('dark-mode');
+    btnModo.textContent = activo ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+    localStorage.setItem('modoOscuro', activo ? 'activo' : 'inactivo');
+  });
+</script>
+
+
 </html>
 
