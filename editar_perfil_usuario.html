@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TalMatch – Editar Perfil (Usuario)</title>
+
+  <!-- Enlaza el CSS dedicado a esta pantalla -->
+  <link rel="stylesheet" href="editar_perfil_usuario.css"/>
+
+  <!-- Fuente opcional (misma familia visual que el resto del proyecto) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Contenedor general -->
+  <div class="page-wrap">
+    <!-- Encabezado con título y controles -->
+    <header class="tm-header">
+      <div class="brand">
+        <img src="imagenes/talmach.jpg" alt="TalMatch" class="logo">
+        <h1>Editar Perfil</h1>
+      </div>
+
+      <div class="header-actions">
+        <!-- Botón Volver (ajusta el href a tu flujo real) -->
+        <a href="inicio_usuario.html" class="btn btn-secondary">← Volver</a>
+
+        <!-- Toggle de modo oscuro -->
+        <label class="theme-toggle">
+          <input id="themeSwitch" type="checkbox" aria-label="Activar modo oscuro">
+          <span class="slider"></span>
+          <span class="theme-label">Modo oscuro</span>
+        </label>
+      </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="tm-container">
+      <!-- Nota: estos mensajes se llenan dinámicamente -->
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+      <!-- Tarjeta: datos básicos -->
+      <section class="card">
+        <h2>Datos personales</h2>
+        <form id="formPerfil" novalidate>
+          <!-- Campo nombre (lectura si tu lógica lo requiere) -->
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="nombre">Nombre completo</label>
+              <input type="text" id="nombre" name="nombre" placeholder="Ej. Juan Pérez" required>
+              <small class="hint">Requerido</small>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Correo electrónico</label>
+              <input type="email" id="email" name="email" placeholder="Ej. juan@mail.com" required>
+              <small class="hint">Requerido</small>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="telefono">Número de celular</label>
+              <input type="tel" id="telefono" name="telefono" placeholder="Ej. +505 8888 0000" required>
+              <small class="hint">Requerido</small>
+            </div>
+
+            <div class="form-group">
+              <label for="linkedin">LinkedIn (opcional)</label>
+              <input type="url" id="linkedin" name="linkedin" placeholder="https://www.linkedin.com/in/usuario">
+              <small class="hint">Opcional</small>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="direccion">Dirección</label>
+              <input type="text" id="direccion" name="direccion" placeholder="Barrio / Calle / Nº casa" required>
+              <small class="hint">Requerido</small>
+            </div>
+
+            <div class="form-group">
+              <label for="ciudad">Ciudad / Departamento</label>
+              <input type="text" id="ciudad" name="ciudad" placeholder="Ej. Tisma, Masaya" required>
+              <small class="hint">Requerido</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="descripcion">Descripción personal</label>
+            <textarea id="descripcion" name="descripcion" rows="4" placeholder="Cuéntanos brevemente sobre ti (experiencia, intereses, habilidades)."></textarea>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="habilidades">Habilidades (separadas por coma)</label>
+              <input type="text" id="habilidades" name="habilidades" placeholder="Excel, Soporte técnico, Redes">
+              <small class="hint">Ejemplo: Excel, HTML, Atención al cliente</small>
+            </div>
+
+            <div class="form-group">
+              <label for="experiencia">Años de experiencia</label>
+              <input type="number" id="experiencia" name="experiencia" min="0" step="1" placeholder="0">
+            </div>
+          </div>
+
+          <!-- Tarjeta: CV -->
+          <div class="divider"></div>
+          <h2>Currículum (CV)</h2>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="cvFile">Subir nuevo CV (PDF o DOCX)</label>
+              <input type="file" id="cvFile" name="cvFile" accept=".pdf,.doc,.docx">
+              <small class="hint">Peso recomendado &lt; 5MB</small>
+            </div>
+
+            <div class="form-group">
+              <label>CV actual</label>
+              <!-- En producción, este enlace vendrá del backend -->
+              <div class="cv-actions">
+                <a id="cvActualLink" href="#" class="link" target="_blank" rel="noopener">No hay CV cargado</a>
+                <button type="button" id="btnEliminarCV" class="btn btn-ghost" title="Eliminar CV actual">Eliminar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Acciones del formulario -->
+          <div class="form-actions">
+            <button type="button" id="btnCancelar" class="btn btn-secondary">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+          </div>
+
+         
+        </form>
+      </section>
+    </main>
+
+    <footer class="tm-footer">
+      <small>© TalMatch · Actualiza tu información para mejores emparejamientos.</small>
+    </footer>
+  </div>
+
+  <!-- ========== LÓGICA JS BÁSICA (SIN BACKEND) ========== -->
+  <script>
+    // Clave localStorage para simular persistencia
+    const KEY_PERFIL = "talmatch_perfil_usuario";
+    const KEY_CV_URL = "talmatch_cv_url";
+
+    // Referencias a elementos
+    const form = document.getElementById("formPerfil");
+    const toast = document.getElementById("toast");
+    const cvInput = document.getElementById("cvFile");
+    const cvLink = document.getElementById("cvActualLink");
+    const btnEliminarCV = document.getElementById("btnEliminarCV");
+    const btnCancelar = document.getElementById("btnCancelar");
+    const themeSwitch = document.getElementById("themeSwitch");
+
+    // ====== Tema (claro/oscuro) ======
+    (() => {
+      const savedTheme = localStorage.getItem("talmatch_theme") || "light";
+      if (savedTheme === "dark") {
+        document.body.classList.add("dark");
+        themeSwitch.checked = true;
+      }
+      themeSwitch.addEventListener("change", () => {
+        document.body.classList.toggle("dark", themeSwitch.checked);
+        localStorage.setItem("talmatch_theme", themeSwitch.checked ? "dark" : "light");
+      });
+    })();
+
+    // ====== Cargar datos simulados ======
+    function cargarPerfil() {
+      try {
+        const raw = localStorage.getItem(KEY_PERFIL);
+        if (!raw) return;
+
+        const data = JSON.parse(raw);
+        for (const [k, v] of Object.entries(data)) {
+          const el = document.getElementById(k);
+          if (!el) continue;
+          if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+            el.value = v ?? "";
+          }
+        }
+      } catch (e) {
+        console.warn("No se pudo cargar perfil:", e);
+      }
+    }
+
+    function cargarCV() {
+      const url = localStorage.getItem(KEY_CV_URL);
+      if (url) {
+        cvLink.textContent = "Ver CV actual";
+        cvLink.href = url;
+      } else {
+        cvLink.textContent = "No hay CV cargado";
+        cvLink.removeAttribute("href");
+      }
+    }
+
+    // ====== Guardar datos simulados ======
+    function guardarPerfil() {
+      const data = {
+        nombre: document.getElementById("nombre").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        telefono: document.getElementById("telefono").value.trim(),
+        linkedin: document.getElementById("linkedin").value.trim(),
+        direccion: document.getElementById("direccion").value.trim(),
+        ciudad: document.getElementById("ciudad").value.trim(),
+        descripcion: document.getElementById("descripcion").value.trim(),
+        habilidades: document.getElementById("habilidades").value.trim(),
+        experiencia: document.getElementById("experiencia").value.trim()
+      };
+
+      // Validación mínima
+      if (!data.nombre || !data.email || !data.telefono || !data.direccion || !data.ciudad) {
+        mostrarToast("Por favor completa los campos requeridos.", "error");
+        return false;
+      }
+
+      localStorage.setItem(KEY_PERFIL, JSON.stringify(data));
+      mostrarToast("Perfil actualizado correctamente.", "success");
+      return true;
+    }
+
+    // ====== Simular carga del archivo CV ======
+    // Nota: En frontend puro no podemos almacenar el archivo. Aquí solo mostramos su nombre
+    // y generamos una URL temporal (blob) para previsualizar mientras la pestaña esté abierta.
+    cvInput.addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const okType = /pdf|msword|officedocument\.wordprocessingml\.document/i.test(file.type) || /\.(pdf|doc|docx)$/i.test(file.name);
+      if (!okType) {
+        mostrarToast("Solo se permiten archivos PDF o DOC/DOCX.", "error");
+        cvInput.value = "";
+        return;
+      }
+
+      // Creamos un blob URL temporal para simular "CV actual"
+      const blobUrl = URL.createObjectURL(file);
+      localStorage.setItem(KEY_CV_URL, blobUrl);
+      cargarCV();
+      mostrarToast("CV cargado (temporal). Recuerda que se requiere backend para guardarlo definitivamente.", "info");
+    });
+
+    btnEliminarCV.addEventListener("click", () => {
+      localStorage.removeItem(KEY_CV_URL);
+      cargarCV();
+      mostrarToast("CV eliminado (local).", "success");
+    });
+
+    // ====== Envío del formulario ======
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      guardarPerfil();
+    });
+
+    // ====== Cancelar (volver) ======
+    btnCancelar.addEventListener("click", () => {
+      // Ajusta el destino según tu flujo
+      window.location.href = "inicio_usuario.html";
+    });
+
+    // ====== Utilidades de UI ======
+    function mostrarToast(msg, type = "info") {
+      toast.textContent = msg;
+      toast.className = `toast ${type} show`;
+      setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    // Inicialización
+    cargarPerfil();
+    cargarCV();
+  </script>
+</body>
+</html>

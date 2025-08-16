@@ -1,92 +1,253 @@
-/* mensajes.css */
+/* ==========================================================
+   TalMatch – Mensajes (actualizado con mejor contraste dark)
+   - Paleta corporativa (azul #00aaff)
+   - Card contenedor con border: 3px solid #00aaff
+   - Layout 2 columnas: hilos + chat
+   - Modo oscuro mejorado (inputs, texto y placeholders)
+   ========================================================== */
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f3f3f3;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+/* --------- Paleta / variables --------- */
+:root{
+  --tm-blue: #00aaff;             /* Azul corporativo */
+  --tm-blue-dark: #0b96d8;        /* Hover/focus */
+  --tm-blue-100: #e6f7ff;         /* Fondo suave */
+
+  --bg: #f4f6f9;                  /* Fondo claro */
+  --card: #ffffff;                 /* Tarjetas */
+  --text: #0f172a;                 /* Texto principal */
+  --muted: #475569;                /* Texto secundario */
+  --border: #a9d7ff;              /* Borde suave */
+  --shadow: 0 10px 20px rgba(20, 60, 120, .06);
+  --radius: 14px;
 }
 
-header {
-  background-color: #005f73;
-  color: white;
-  padding: 20px;
-  text-align: center;
+/* --------- Modo oscuro con alto contraste --------- */
+body.dark{
+  --bg: #0b1324;                  /* Fondo general */
+  --card: #0f1b2e;                /* Paneles */
+  --text: #eaf2ff;                /* Texto principal */
+  --muted: #b6c3d7;               /* Texto secundario legible */
+  --border: #1f3b59;              /* Divisores */
+  --tm-blue: #3fc2ff;             /* Azul en dark */
+  --tm-blue-dark: #2fb0ec;
+  --tm-blue-100: #0b2540;         /* Fondo sutil azul */
+  --shadow: 0 10px 24px rgba(0,0,0,.45);
 }
 
-.chat-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  max-width: 800px;
-  margin: auto;
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  overflow: hidden;
+/* --------- Base / tipografía --------- */
+*{ box-sizing:border-box }
+html,body{ height:100% }
+body{
+  margin:0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+  line-height:1.5;
 }
 
-.chat-box {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
+/* --------- Layout general --------- */
+.page-wrap{ min-height:100%; display:flex; flex-direction:column; }
+
+/* Header superior */
+.tm-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px;
+  background: var(--card);
+  border-bottom: 3px solid var(--tm-blue);
+  position: sticky; top:0; z-index:10;
+}
+.brand{ display:flex; align-items:center; gap:12px; }
+.logo{ width:44px; height:44px; object-fit:contain; border-radius:10px; background:#fff; box-shadow: var(--shadow); }
+.tm-header h1{ margin:0; font-size: clamp(18px, 2.4vw, 24px); }
+.header-actions{ display:flex; align-items:center; gap:12px; }
+
+/* Contenedor central */
+.tm-container{ width:min(1100px, 94%); margin:24px auto; }
+
+/* --------- Card principal (borde 3px #00aaff) --------- */
+.card.chat-card{
+  background: var(--card);
+  border: 3px solid var(--tm-blue);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
 }
 
-.mensaje {
-  margin-bottom: 15px;
-  max-width: 75%;
-  padding: 10px;
-  border-radius: 10px;
-  position: relative;
+/* Toolbar superior */
+.toolbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.toolbar h2{ margin:0; font-size:18px; }
+.toolbar .right{ display:flex; gap:8px; }
+
+/* --------- Botones (base y variantes) --------- */
+.btn{
+  appearance:none;
+  border:2px solid var(--tm-blue);
+  background:#fff;
+  color: var(--tm-blue-dark);
+  padding:10px 14px;
+  border-radius:12px;
+  font-weight:600;
+  cursor:pointer;
+  transition: transform .04s ease, background .2s ease, filter .2s ease, color .2s ease, border-color .2s ease;
+}
+.btn:active{ transform: translateY(1px); }
+
+/* Primario: relleno azul */
+.btn-primary{
+  background: var(--tm-blue);
+  color:#fff;
+  border-color: var(--tm-blue-dark);
+  box-shadow: 0 4px 10px rgba(0,170,255,.25);
+}
+.btn-primary:hover{ filter:brightness(1.05); }
+
+/* Secundario: contorno azul (para “Ver perfil de empresa”) */
+.btn-secondary{
+  display:inline-block;
+  background:#fff;
+  border-color: var(--tm-blue);
+  color: var(--tm-blue-dark);
+  text-decoration:none;
+}
+.btn-secondary:hover{ background: var(--tm-blue-100); }
+body.dark .btn-secondary{
+  background: transparent;
+  border-color: var(--tm-blue);
+  color: var(--tm-blue);
+}
+body.dark .btn-secondary:hover{
+  background: color-mix(in srgb, var(--tm-blue-100) 70%, transparent);
 }
 
-.mensaje.empresa {
-  background-color: #d9f99d;
-  align-self: flex-start;
+/* Ghost: sutil */
+.btn-ghost{ border-color: var(--border); color: var(--muted); }
+.btn-ghost:hover{ color: var(--text); background: var(--tm-blue-100); }
+
+/* --------- Layout de chat --------- */
+.chat-layout{
+  display:grid;
+  grid-template-columns: 320px 1fr;  /* lista de hilos + chat */
+  gap:12px;
 }
 
-.mensaje.usuario {
-  background-color: #cafffb;
-  align-self: flex-end;
-  margin-left: auto;
+/* Columna izquierda (hilos) */
+.threads{
+  background:#fff;
+  border:2px solid var(--tm-blue);
+  border-radius:12px;
+  padding:10px;
+}
+.search input{
+  width:100%; padding:10px 12px; border:2px solid var(--tm-blue);
+  border-radius:10px; outline:none; background:#fff; color:var(--text);
+}
+.search input:focus{
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tm-blue) 25%, transparent);
+  background: var(--tm-blue-100);
+}
+.summary{ color:var(--muted); font-size:13px; margin:8px 2px; }
+
+.threads-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; max-height:520px; overflow:auto; }
+.thread{
+  border:2px solid var(--border);
+  border-radius:10px; padding:8px 10px; background:#fff; cursor:pointer;
+}
+.thread:hover{ background: var(--tm-blue-100); }
+.thread.active{ border-color: var(--tm-blue); background: #fafdff; }
+.thread-title{ font-weight:700; }
+.thread-last{ color:var(--muted); font-size:13px; margin-top:2px; }
+.thread-time{ color:var(--muted); font-size:12px; margin-top:4px; }
+
+/* Columna derecha (chat) */
+.chat{
+  background:#fff; border:2px solid var(--tm-blue);
+  border-radius:12px; display:flex; flex-direction:column;
+}
+.chat-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 12px; border-bottom:2px dashed var(--border);
+}
+.chat-meta h3{ margin:0; font-size:16px; }
+.truncate{ max-width:52vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.muted{ color:var(--muted); }
+
+/* Borde divisor entre hilos y chat (vertical) — opcional
+.chat:before{ content:""; width:0; border-left:2px dashed var(--border); } */
+
+.messages{
+  padding:12px; display:flex; flex-direction:column; gap:10px;
+  height: 420px; overflow:auto; background: linear-gradient(180deg, #fff, #fafdff);
 }
 
-.mensaje p {
-  margin: 0;
+/* Burbujas */
+.msg{ max-width:72%; padding:10px 12px; border-radius:14px; border:2px solid var(--border); }
+.msg .msg-text{ white-space:pre-wrap; }
+.msg .msg-time{ color:var(--muted); font-size:11px; margin-top:4px; }
+.msg.mine{ align-self:flex-end; background:#e9f8ff; border-color: var(--tm-blue); }
+.msg.theirs{ align-self:flex-start; background:#fff; }
+
+/* Escribiendo… */
+.typing{ display:flex; align-items:center; gap:6px; padding: 0 12px 8px 12px; color: var(--muted); }
+.dot{ width:6px; height:6px; border-radius:50%; background: var(--muted); display:inline-block; animation: blink 1s infinite ease-in-out; }
+.dot:nth-child(2){ animation-delay:.15s } .dot:nth-child(3){ animation-delay:.3s }
+@keyframes blink{ 0%,100%{opacity:.2} 50%{opacity:1} }
+.typing-text{ font-size:12px; }
+
+/* Caja de envío */
+.send-box{ display:flex; gap:8px; padding:10px; border-top:2px dashed var(--border); }
+.send-box input{
+  flex:1; border:2px solid var(--tm-blue); border-radius:10px; padding:10px 12px;
+  outline:none; background:#fff; color:var(--text);
+}
+.send-box input::placeholder{ color:#8aa5bf; }
+.send-box input:focus{
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tm-blue) 25%, transparent);
+  background: var(--tm-blue-100);
 }
 
-.mensaje span {
-  font-size: 12px;
-  color: #555;
-  display: block;
-  margin-top: 5px;
+/* Toast */
+.toast{
+  position:fixed; right:16px; top:78px; background:var(--card); color:var(--text);
+  border:2px solid var(--tm-blue); border-radius:12px; padding:10px 14px; box-shadow: var(--shadow);
+  opacity:0; pointer-events:none; transform:translateY(-8px); transition: opacity .2s, transform .2s; z-index:20;
 }
+.toast.show{ opacity:1; pointer-events:auto; transform:translateY(0); }
 
-.formulario-chat {
-  display: flex;
-  border-top: 1px solid #ccc;
+/* Footer */
+.tm-footer{ margin-top:auto; padding:16px 20px; color:var(--muted); text-align:center; }
+
+/* Toggle tema */
+.theme-toggle{ display:inline-flex; align-items:center; gap:10px; user-select:none; }
+.theme-toggle input{ display:none; }
+.theme-label{ font-size:14px; color:var(--muted); }
+.slider{
+  width:44px; height:24px; border-radius:999px; background:#c7e5ff; position:relative; border:2px solid var(--tm-blue);
 }
-
-.formulario-chat input {
-  flex: 1;
-  padding: 15px;
-  border: none;
-  outline: none;
-  font-size: 16px;
+.slider::after{
+  content:""; position:absolute; top:50%; left:2px; translate:0 -50%;
+  width:20px; height:20px; border-radius:50%; background:#fff; border:2px solid var(--tm-blue); box-shadow: var(--shadow); transition:left .2s;
 }
+input:checked + .slider{ background: var(--tm-blue); border-color: var(--tm-blue-dark); }
+input:checked + .slider::after{ left:22px; }
 
-.formulario-chat button {
-  background-color: #0a9396;
-  color: white;
-  border: none;
-  padding: 0 25px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
+/* --------- DARK: ajustes extra para legibilidad --------- */
+body.dark .threads,
+body.dark .chat{ background: var(--card); border-color: var(--tm-blue); }
 
-.formulario-chat button:hover {
-  background-color: #00707c;
+body.dark .thread{ background: #0f1b2e; border-color: var(--border); color: var(--text); }
+body.dark .thread.active{ background: color-mix(in srgb, var(--tm-blue-100) 65%, transparent); border-color: var(--tm-blue); }
+
+body.dark .messages{ background: linear-gradient(180deg, var(--card), #0f1b2e); }
+
+body.dark .msg{ background:#0f1b2e; border-color: var(--border); color: var(--text); }
+body.dark .msg.mine{ background: color-mix(in srgb, var(--tm-blue-100) 70%, transparent); border-color: var(--tm-blue); }
+
+body.dark .send-box{ border-top-color: var(--border); }
+body.dark .send-box input{ background:#0f1b2e; color: var(--text); border-color: var(--tm-blue); }
+body.dark .send-box input::placeholder{ color:#90a4bd; }
+
+/* Responsive */
+@media (max-width: 860px){
+  .chat-layout{ grid-template-columns: 1fr; }
+  .truncate{ max-width: 80vw; }
 }

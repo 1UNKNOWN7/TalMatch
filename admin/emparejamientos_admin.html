@@ -1,97 +1,218 @@
-<!-- emparejamientos_admin.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Emparejamientos - Admin</title>
-  <link rel="stylesheet" href="inicio_admin.css">
-  <link rel="stylesheet" href="modo_oscuro.css">
-  <style>
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 30px;
-    }
+  <!-- ===== Meta ===== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>TalMatch – Emparejamientos</title>
 
-    th, td {
-      border: 1px solid #ccc;
-      padding: 12px;
-      text-align: center;
-    }
+  <!-- ===== Estilos ===== -->
+  <link rel="stylesheet" href="emparejamientos_admin.css"/>
 
-    th {
-      background-color: #f0f0f0;
-    }
-
-    button {
-      margin-top: 20px;
-      padding: 10px 15px;
-      background-color: #1a73e8;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #0f5cc0;
-    }
-  </style>
+  <!-- Fuente coherente -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <h1>Emparejamientos Realizados</h1>
-    <nav>
-      <ul>
-        <li><a href="inicio_admin.html">Volver al Panel</a></li>
-      </ul>
-    </nav>
-  </header>
+  <div class="page-wrap">
+    <!-- ===== Header ===== -->
+    <header class="tm-header">
+      <div class="brand">
+        <img src="/imagenes/talmach.jpg" alt="TalMatch" class="logo">
+        <h1>Emparejamientos (Matches)</h1>
+      </div>
+      <div class="header-actions">
+        <a href="inicio_admin.html" class="btn btn-secondary">← Volver</a>
+        <!-- Toggle dark mode -->
+        <label class="theme-toggle">
+          <input id="themeSwitch" type="checkbox" aria-label="Activar modo oscuro">
+          <span class="slider"></span>
+          <span class="theme-label">Modo oscuro</span>
+        </label>
+      </div>
+    </header>
 
-  <main>
-    <table>
-      <thead>
-        <tr>
-          <th>Estudiante</th>
-          <th>Empresa</th>
-          <th>Cargo</th>
-          <th>Estado</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Sofía Ruiz</td>
-          <td>DataSoft</td>
-          <td>Analista Junior</td>
-          <td>Confirmado</td>
-        </tr>
-        <!-- Más matches -->
-      </tbody>
-    </table>
+    <main class="tm-container">
+      <!-- Toast -->
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-    <div style="text-align:center;">
-      <button>Crear nuevo emparejamiento</button>
-    </div>
-  </main>
+      <!-- ===== Card principal: filtros y lista de emparejamientos ===== -->
+      <section class="card">
+        <h2>Listado de emparejamientos</h2>
+
+        <!-- Barra de filtros -->
+        <div class="toolbar">
+          <div class="control">
+            <label for="filtroPeriodo">Periodo</label>
+            <select id="filtroPeriodo">
+              <option value="30">Últimos 30 días</option>
+              <option value="90">Últimos 90 días</option>
+              <option value="365">Últimos 12 meses</option>
+              <option value="ALL">Todos</option>
+            </select>
+          </div>
+
+          <div class="control">
+            <label for="filtroEstado">Estado</label>
+            <select id="filtroEstado">
+              <option value="TODOS">Todos</option>
+              <option value="ABIERTO">Abierto</option>
+              <option value="EN_PROCESO">En proceso</option>
+              <option value="CERRADO">Cerrado</option>
+            </select>
+          </div>
+
+          <div class="control grow">
+            <label for="busqueda">Buscar</label>
+            <input id="busqueda" type="search" placeholder="Empresa, candidato o ID...">
+          </div>
+
+          <div class="actions">
+            <button id="btnDemo" class="btn btn-ghost" type="button">Cargar demo</button>
+            <button id="btnReset" class="btn btn-ghost" type="button">Reiniciar</button>
+          </div>
+        </div>
+
+        <!-- Resumen -->
+        <div class="summary">
+          <span id="sumTotal">0 matches</span>
+          <span class="dot">•</span>
+          <span id="sumCerrados">0 cerrados</span>
+          <span class="dot">•</span>
+          <span id="sumConversion">0% conversión</span>
+        </div>
+
+        <!-- Tabla responsive -->
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Empresa</th>
+                <th>Candidato</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th class="col-acciones">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyMatches">
+              <!-- filas via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="tm-footer"><small>© TalMatch · Admin</small></footer>
+  </div>
+
+  <!-- ===== JS DEMO (sin backend) ===== -->
+  <script>
+    // ---- Storage keys
+    const KEY_THEME = "talmatch_theme";
+    const KEY_ADMIN_MATCH = "talmatch_admin_matches";
+
+    // ---- Refs
+    const themeSwitch = document.getElementById('themeSwitch');
+    const toast = document.getElementById('toast');
+    const filtroPeriodo = document.getElementById('filtroPeriodo');
+    const filtroEstado = document.getElementById('filtroEstado');
+    const busqueda = document.getElementById('busqueda');
+    const btnDemo = document.getElementById('btnDemo');
+    const btnReset = document.getElementById('btnReset');
+    const tbody = document.getElementById('tbodyMatches');
+    const sumTotal = document.getElementById('sumTotal');
+    const sumCerrados = document.getElementById('sumCerrados');
+    const sumConversion = document.getElementById('sumConversion');
+
+    // ---- Tema
+    (function initTheme(){
+      const saved = localStorage.getItem(KEY_THEME) || "light";
+      if (saved === "dark") { document.body.classList.add("dark"); themeSwitch.checked = true; }
+      themeSwitch.addEventListener("change", ()=>{
+        document.body.classList.toggle("dark", themeSwitch.checked);
+        localStorage.setItem(KEY_THEME, themeSwitch.checked ? "dark" : "light");
+      });
+    })();
+
+    // ---- Utils
+    function toastMsg(msg,type="info"){ toast.textContent = msg; toast.className = `toast ${type} show`; setTimeout(()=>toast.classList.remove('show'),1800); }
+    function save(data){ localStorage.setItem(KEY_ADMIN_MATCH, JSON.stringify(data)); }
+    function load(){ try{ return JSON.parse(localStorage.getItem(KEY_ADMIN_MATCH) || "[]"); }catch{ return []; } }
+    const today = new Date();
+    const subDays = (n)=> { const d = new Date(); d.setDate(d.getDate()-n); return d; };
+    const inLast = (dateIso, days) => !days ? true : (new Date(dateIso) >= subDays(days));
+    const fmt = (iso)=> new Date(iso).toLocaleDateString();
+
+    // ---- Seeds
+    function demo(){
+      const d = new Date();
+      const iso = (offset)=> { const x = new Date(); x.setDate(x.getDate()-offset); return x.toISOString(); }
+      return [
+        { id:"M-3001", empresa:"TecnoMasaya S.A.", candidato:"Cecilia Méndez", fecha: iso(2), estado:"ABIERTO" },
+        { id:"M-3002", empresa:"AgroNica", candidato:"Edgar Guzmán", fecha: iso(10), estado:"EN_PROCESO" },
+        { id:"M-3003", empresa:"BlueCloud", candidato:"Susan Lediar", fecha: iso(28), estado:"CERRADO" },
+        { id:"M-3004", empresa:"FinanSoft Group", candidato:"Luis Ortega", fecha: iso(35), estado:"CERRADO" },
+        { id:"M-3005", empresa:"TecnoMasaya S.A.", candidato:"Ana Reyes", fecha: iso(65), estado:"EN_PROCESO" },
+      ];
+    }
+
+    let matches = load();
+
+    // ---- Render
+    function render(){
+      const per = filtroPeriodo.value;
+      const days = per==="ALL" ? null : parseInt(per,10);
+      const est = filtroEstado.value;
+      const q = (busqueda.value||"").toLowerCase().trim();
+
+      const data = matches.filter(m=>{
+        const okT = days===null || inLast(m.fecha, days);
+        const okE = est==="TODOS" || m.estado===est;
+        const txt = (m.empresa+" "+m.candidato+" "+m.id).toLowerCase();
+        const okQ = q==="" || txt.includes(q);
+        return okT && okE && okQ;
+      });
+
+      // Tabla
+      tbody.innerHTML = "";
+      if(!data.length){
+        tbody.innerHTML = `<tr><td class="empty" colspan="6">Sin resultados</td></tr>`;
+      } else {
+        for(const m of data){
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td data-label="ID">${m.id}</td>
+            <td data-label="Empresa"><strong>${m.empresa}</strong></td>
+            <td data-label="Candidato">${m.candidato}</td>
+            <td data-label="Fecha">${fmt(m.fecha)}</td>
+            <td data-label="Estado"><span class="pill ${m.estado.toLowerCase()}">${m.estado}</span></td>
+            <td data-label="Acciones" class="acciones">
+              <a class="btn btn-secondary" href="vempresa.html">Ver empresa</a>
+              <a class="btn btn-secondary" href="vpusuario.html">Ver candidato</a>
+            </td>`;
+          tbody.appendChild(tr);
+        }
+      }
+
+      // Resumen/conversión (cerrados / total)
+      const total = data.length;
+      const cerrados = data.filter(x=>x.estado==="CERRADO").length;
+      const conv = total ? Math.round((cerrados/total)*100) : 0;
+      sumTotal.textContent = `${total} matches`;
+      sumCerrados.textContent = `${cerrados} cerrados`;
+      sumConversion.textContent = `${conv}% conversión`;
+    }
+
+    // ---- Eventos
+    filtroPeriodo.addEventListener("change", render);
+    filtroEstado.addEventListener("change", render);
+    busqueda.addEventListener("input", render);
+    btnDemo.addEventListener("click", ()=>{ matches = demo(); save(matches); render(); toastMsg("Datos de demo cargados","success"); });
+    btnReset.addEventListener("click", ()=>{ localStorage.removeItem(KEY_ADMIN_MATCH); matches=[]; render(); toastMsg("Demo reiniciada","success"); });
+
+    // Init
+    render();
+  </script>
 </body>
-
-<!-- FUNICIONALIDAD MODO OSCURO-->    
-    <script>
-  const btnModo = document.getElementById('modoOscuroBtn');
-  const root = document.documentElement;
-
-  // Cargar desde localStorage
-  if (localStorage.getItem('modoOscuro') === 'activo') {
-    document.documentElement.classList.add('dark-mode');
-    btnModo.textContent = '☀️ Modo Claro';
-  }
-
-  btnModo.addEventListener('click', () => {
-    document.documentElement.classList.toggle('dark-mode');
-    const activo = document.documentElement.classList.contains('dark-mode');
-    btnModo.textContent = activo ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
-    localStorage.setItem('modoOscuro', activo ? 'activo' : 'inactivo');
-  });
-</script>
-
 </html>

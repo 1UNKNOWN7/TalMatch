@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- ================== Metadatos básicos ================== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TalMatch – Solicitudes recibidas</title>
+
+  <!-- ================== Hoja de estilos de esta vista ================== -->
+  <link rel="stylesheet" href="solicitudes_usuario.css"/>
+
+  <!-- ================== Fuente consistente con el proyecto ================== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- =========================================================
+       CONTENEDOR GENERAL
+       Agrupa Header, Main y Footer para controlar el layout
+  ========================================================== -->
+  <div class="page-wrap">
+
+    <!-- ================== ENCABEZADO SUPERIOR ================== -->
+    <header class="tm-header">
+      <!-- Marca + título de la pantalla -->
+      <div class="brand">
+        <img src="imagenes/talmach.jpg" alt="TalMatch" class="logo">
+        <h1>Solicitudes de reclutamiento</h1>
+      </div>
+
+      <!-- Acciones del header: volver + modo oscuro -->
+      <div class="header-actions">
+        <!-- Botón para volver al inicio del usuario (ajusta el destino a tu flujo real) -->
+        <a href="inicio_usuario.html" class="btn btn-secondary">← Volver</a>
+
+        <!-- Toggle de Modo Oscuro (igual al de otras pantallas) -->
+        <label class="theme-toggle">
+          <input id="themeSwitch" type="checkbox" aria-label="Activar modo oscuro">
+          <span class="slider"></span>
+          <span class="theme-label">Modo oscuro</span>
+        </label>
+      </div>
+    </header>
+
+    <!-- =============== CONTENIDO PRINCIPAL =============== -->
+    <main class="tm-container">
+      <!-- Toast para mensajes de feedback (éxito/error/info) -->
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+      <!-- ================== CONTROLES SUPERIORES ================== -->
+      <section class="card">
+        <h2>Solicitudes recibidas</h2>
+
+        <!-- Barra de controles: filtro por estado, buscador y acciones demo -->
+        <div class="toolbar">
+          <!-- Filtro por estado (todos/pendiente/aceptada/rechazada) -->
+          <div class="control">
+            <label for="filtroEstado">Estado</label>
+            <select id="filtroEstado">
+              <option value="TODOS">Todos</option>
+              <option value="PENDIENTE">Pendiente</option>
+              <option value="ACEPTADA">Aceptada</option>
+              <option value="RECHAZADA">Rechazada</option>
+            </select>
+          </div>
+
+          <!-- Búsqueda por nombre de empresa o rubro -->
+          <div class="control grow">
+            <label for="busqueda">Buscar</label>
+            <input id="busqueda" type="search" placeholder="Empresa o rubro... (Ej. Desarrollo, Marketing)">
+          </div>
+
+          <!-- Acciones de demo: cargar datos y resetear -->
+          <div class="actions">
+            <button id="btnCargarDemo" type="button" class="btn btn-ghost" title="Cargar datos de ejemplo">Cargar demo</button>
+            <button id="btnResetear" type="button" class="btn btn-ghost" title="Eliminar solicitudes guardadas">Reiniciar</button>
+          </div>
+        </div>
+
+        <!-- Resumen/contador (se actualiza dinámicamente) -->
+        <div class="summary">
+          <span id="resumenConteo">0 solicitudes</span>
+          <span class="dot">•</span>
+          <span id="resumenPendientes">0 pendientes</span>
+        </div>
+
+        <!-- ================== LISTA DE SOLICITUDES ==================
+             Tabla accesible (con roles) que en móvil se “rompe” a tarjetas
+        ============================================================= -->
+        <div class="table-wrap" role="region" aria-labelledby="tablaSolicitudesTitulo">
+          <table class="table" aria-describedby="tablaSolicitudesDesc">
+            <caption id="tablaSolicitudesTitulo" class="sr-only">Listado de solicitudes de reclutamiento</caption>
+            <thead>
+              <tr>
+                <th scope="col">Empresa</th>
+                <th scope="col">Rubro</th>
+                <th scope="col">Mensaje</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Estado</th>
+                <th scope="col" class="col-acciones">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbodySolicitudes">
+              <!-- Filas generadas dinámicamente por JS -->
+            </tbody>
+          </table>
+          <p id="tablaSolicitudesDesc" class="sr-only">
+            Use los botones de aceptar o rechazar para actualizar el estado de cada solicitud.
+          </p>
+        </div>
+
+        <!-- Paginación simple (cliente). En esta demo mostramos todo,
+             pero dejamos el componente por si quieres activarla luego. -->
+        <!--
+        <div class="pagination">
+          <button class="btn btn-secondary" disabled>« Anterior</button>
+          <span>Página 1 de 1</span>
+          <button class="btn btn-secondary" disabled>Siguiente »</button>
+        </div>
+        -->
+      </section>
+    </main>
+
+    <!-- ================== PIE DE PÁGINA ================== -->
+    <footer class="tm-footer">
+      <small>© TalMatch · Gestiona tus solicitudes y crea matches de calidad.</small>
+    </footer>
+  </div>
+
+  <!-- ========== LÓGICA JS SIN BACKEND (DEMO CON localStorage) ========== -->
+  <script>
+    // -------------------- Claves en localStorage --------------------
+    // Lista de solicitudes recibidas por el usuario (array de objetos)
+    const KEY_SOLICITUDES = "talmatch_solicitudes_usuario";
+    // Para modo oscuro global coherente con el resto del sitio
+    const KEY_THEME = "talmatch_theme";
+    // Badge global de pendientes (otras páginas pueden leer este valor)
+    const KEY_BADGE_SOLICITUDES = "talmatch_badge_solicitudes";
+
+    // -------------------- Referencias a elementos --------------------
+    const themeSwitch = document.getElementById("themeSwitch");
+    const toast = document.getElementById("toast");
+    const filtroEstado = document.getElementById("filtroEstado");
+    const busqueda = document.getElementById("busqueda");
+    const btnCargarDemo = document.getElementById("btnCargarDemo");
+    const btnResetear = document.getElementById("btnResetear");
+    const tbodySolicitudes = document.getElementById("tbodySolicitudes");
+    const resumenConteo = document.getElementById("resumenConteo");
+    const resumenPendientes = document.getElementById("resumenPendientes");
+
+    // -------------------- Estado en memoria (UI) --------------------
+    // En esta demo, mantenemos una copia en memoria de las solicitudes
+    let solicitudes = [];
+
+    // -------------------- Tema (claro/oscuro) --------------------
+    (function initTheme(){
+      const saved = localStorage.getItem(KEY_THEME) || "light";
+      if (saved === "dark") {
+        document.body.classList.add("dark");
+        themeSwitch.checked = true;
+      }
+      themeSwitch.addEventListener("change", () => {
+        document.body.classList.toggle("dark", themeSwitch.checked);
+        localStorage.setItem(KEY_THEME, themeSwitch.checked ? "dark" : "light");
+      });
+    })();
+
+    // -------------------- Seeds de ejemplo --------------------
+    function crearSolicitudesDemo() {
+      // Conjunto pequeño pero variado de solicitudes
+      const demo = [
+        {
+          id: "S-1001",
+          empresaId: "E-01",
+          empresaNombre: "TecnoMasaya S.A.",
+          empresaRubro: "Desarrollo de Software",
+          mensaje: "Nos interesa tu experiencia en soporte técnico y redes.",
+          fecha: "2025-08-05",
+          estado: "PENDIENTE" // PENDIENTE | ACEPTADA | RECHAZADA
+        },
+        {
+          id: "S-1002",
+          empresaId: "E-02",
+          empresaNombre: "AgroNica",
+          empresaRubro: "Agroindustria",
+          mensaje: "Buscamos practicante para optimización de procesos TI.",
+          fecha: "2025-08-06",
+          estado: "PENDIENTE"
+        },
+        {
+          id: "S-1003",
+          empresaId: "E-03",
+          empresaNombre: "FinanSoft Group",
+          empresaRubro: "Fintech",
+          mensaje: "Tu perfil encaja con nuestro equipo de soporte ERP.",
+          fecha: "2025-08-02",
+          estado: "ACEPTADA"
+        },
+        {
+          id: "S-1004",
+          empresaId: "E-04",
+          empresaNombre: "BlueCloud",
+          empresaRubro: "Cloud & Infra",
+          mensaje: "Tenemos vacante de pasante en automatización.",
+          fecha: "2025-07-29",
+          estado: "RECHAZADA"
+        }
+      ];
+      localStorage.setItem(KEY_SOLICITUDES, JSON.stringify(demo));
+      return demo;
+    }
+
+    // -------------------- Utilidades varias --------------------
+    // Muestra un toast con mensaje y estilo (info/success/error)
+    function showToast(msg, type="info") {
+      toast.textContent = msg;
+      toast.className = `toast ${type} show`;
+      setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    // Formatea YYYY-MM-DD a DD/MM/YYYY
+    function formatearFecha(iso) {
+      if (!iso) return "";
+      const [y,m,d] = iso.split("-");
+      return `${d}/${m}/${y}`;
+    }
+
+    // Guarda la lista en localStorage y actualiza badge de pendientes
+    function persistirSolicitudes() {
+      localStorage.setItem(KEY_SOLICITUDES, JSON.stringify(solicitudes));
+      const pendientes = solicitudes.filter(s => s.estado === "PENDIENTE").length;
+      localStorage.setItem(KEY_BADGE_SOLICITUDES, String(pendientes));
+    }
+
+    // Lee solicitudes desde localStorage (si no hay, devuelve [])
+    function cargarSolicitudes() {
+      try {
+        const raw = localStorage.getItem(KEY_SOLICITUDES);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    // -------------------- Renderizado de tabla --------------------
+    function renderSolicitudes() {
+      // Toma el filtro actual
+      const estado = filtroEstado.value;
+      const q = busqueda.value.trim().toLowerCase();
+
+      // Aplica filtros (estado + búsqueda por empresa/rubro)
+      const filtradas = solicitudes.filter(s => {
+        const okEstado = (estado === "TODOS") || (s.estado === estado);
+        const texto = (s.empresaNombre + " " + s.empresaRubro).toLowerCase();
+        const okBusqueda = q === "" || texto.includes(q);
+        return okEstado && okBusqueda;
+      });
+
+      // Borra filas actuales
+      tbodySolicitudes.innerHTML = "";
+
+      // Si no hay resultados, mostrar estado vacío
+      if (filtradas.length === 0) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 6;
+        td.className = "empty";
+        td.textContent = "No hay solicitudes para mostrar con los filtros actuales.";
+        tr.appendChild(td);
+        tbodySolicitudes.appendChild(tr);
+      } else {
+        // Genera filas
+        for (const s of filtradas) {
+          const tr = document.createElement("tr");
+
+          // Columna: Empresa
+          const tdEmpresa = document.createElement("td");
+          tdEmpresa.dataset.label = "Empresa";
+          tdEmpresa.innerHTML = `
+            <div class="empresa">
+              <strong>${s.empresaNombre}</strong>
+              <div class="muted">ID: ${s.id}</div>
+            </div>
+          `;
+          tr.appendChild(tdEmpresa);
+
+          // Columna: Rubro
+          const tdRubro = document.createElement("td");
+          tdRubro.dataset.label = "Rubro";
+          tdRubro.textContent = s.empresaRubro;
+          tr.appendChild(tdRubro);
+
+          // Columna: Mensaje
+          const tdMensaje = document.createElement("td");
+          tdMensaje.dataset.label = "Mensaje";
+          tdMensaje.textContent = s.mensaje;
+          tr.appendChild(tdMensaje);
+
+          // Columna: Fecha
+          const tdFecha = document.createElement("td");
+          tdFecha.dataset.label = "Fecha";
+          tdFecha.textContent = formatearFecha(s.fecha);
+          tr.appendChild(tdFecha);
+
+          // Columna: Estado (con pill)
+          const tdEstado = document.createElement("td");
+          tdEstado.dataset.label = "Estado";
+          tdEstado.innerHTML = `<span class="pill ${s.estado.toLowerCase()}">${s.estado}</span>`;
+          tr.appendChild(tdEstado);
+
+          // Columna: Acciones
+          const tdAcciones = document.createElement("td");
+          tdAcciones.dataset.label = "Acciones";
+          tdAcciones.className = "acciones";
+
+          // Botones condicionales según estado
+          if (s.estado === "PENDIENTE") {
+            // Aceptar
+            const btnA = document.createElement("button");
+            btnA.type = "button";
+            btnA.className = "btn btn-primary";
+            btnA.textContent = "Aceptar";
+            btnA.addEventListener("click", () => {
+              s.estado = "ACEPTADA";
+              persistirSolicitudes();
+              renderSolicitudes();
+              showToast("Solicitud aceptada. Ahora puedes chatear con la empresa (simulado).", "success");
+            });
+
+            // Rechazar
+            const btnR = document.createElement("button");
+            btnR.type = "button";
+            btnR.className = "btn btn-secondary";
+            btnR.textContent = "Rechazar";
+            btnR.addEventListener("click", () => {
+              s.estado = "RECHAZADA";
+              persistirSolicitudes();
+              renderSolicitudes();
+              showToast("Solicitud rechazada.", "info");
+            });
+
+            tdAcciones.appendChild(btnA);
+            tdAcciones.appendChild(btnR);
+          } else if (s.estado === "ACEPTADA") {
+            // Ver perfil de la empresa (enlaza a una vista futura)
+            const linkPerfil = document.createElement("a");
+            linkPerfil.href = "#"; // TODO: enlazar a perfil_empresa.html?id=" + s.empresaId
+            linkPerfil.className = "link";
+            linkPerfil.textContent = "Ver perfil de empresa";
+            tdAcciones.appendChild(linkPerfil);
+
+            // Ir a mensajes (si hay match, habilitado)
+            const btnMsg = document.createElement("a");
+            btnMsg.href = "mensajes.html"; // Vista de chat (simulada)
+            btnMsg.className = "btn btn-primary";
+            btnMsg.textContent = "Mensajear";
+            tdAcciones.appendChild(btnMsg);
+          } else {
+            // Estado RECHAZADA: permitir revertir si quieres
+            const btnRevertir = document.createElement("button");
+            btnRevertir.type = "button";
+            btnRevertir.className = "btn btn-ghost";
+            btnRevertir.textContent = "Revertir a pendiente";
+            btnRevertir.addEventListener("click", () => {
+              s.estado = "PENDIENTE";
+              persistirSolicitudes();
+              renderSolicitudes();
+              showToast("Solicitud revertida a Pendiente.", "info");
+            });
+            tdAcciones.appendChild(btnRevertir);
+          }
+
+          tr.appendChild(tdAcciones);
+          tbodySolicitudes.appendChild(tr);
+        }
+      }
+
+      // Actualiza resumen y badge global
+      resumenConteo.textContent = `${solicitudes.length} solicitudes`;
+      const pendientes = solicitudes.filter(x => x.estado === "PENDIENTE").length;
+      resumenPendientes.textContent = `${pendientes} pendientes`;
+      localStorage.setItem(KEY_BADGE_SOLICITUDES, String(pendientes));
+    }
+
+    // -------------------- Inicialización --------------------
+    (function init(){
+      // Cargar desde storage; si no hay datos, dejamos la lista vacía
+      solicitudes = cargarSolicitudes();
+
+      // Listeners de filtro/búsqueda/acciones
+      filtroEstado.addEventListener("change", renderSolicitudes);
+      busqueda.addEventListener("input", renderSolicitudes);
+
+      btnCargarDemo.addEventListener("click", () => {
+        solicitudes = crearSolicitudesDemo();
+        showToast("Datos de demostración cargados.", "success");
+        renderSolicitudes();
+      });
+
+      btnResetear.addEventListener("click", () => {
+        localStorage.removeItem(KEY_SOLICITUDES);
+        solicitudes = [];
+        renderSolicitudes();
+        showToast("Solicitudes eliminadas.", "success");
+      });
+
+      // Guarda el estado actual (por si no existía la clave)
+      persistirSolicitudes();
+
+      // Primer render
+      renderSolicitudes();
+    })();
+  </script>
+</body>
+</html>

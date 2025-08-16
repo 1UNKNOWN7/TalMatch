@@ -1,56 +1,190 @@
-/* solicitudes_empresa.css */
+/* ==========================================================
+   TalMatch – Solicitudes (Empresa)
+   - Paleta corporativa (azul #00aaff)
+   - Card principal con border: 3px solid #00aaff
+   - Tabla responsive -> tarjetas en móvil
+   - Modo oscuro con alto contraste
+   ========================================================== */
 
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f3f3f3;
-  margin: 0;
-  padding: 0;
+/* ---------- Tokens / colores ---------- */
+:root{
+  --tm-blue: #00aaff;            /* Azul corporativo */
+  --tm-blue-dark: #0b96d8;       /* Hover/focus */
+  --tm-blue-100: #e6f7ff;        /* Fondo sutil */
+
+  --bg: #f4f6f9;                 /* Fondo general */
+  --card: #ffffff;               /* Paneles */
+  --text: #0f172a;               /* Texto */
+  --muted: #475569;              /* Texto secundario */
+  --border: #a9d7ff;             /* Borde suave */
+  --shadow: 0 10px 20px rgba(20, 60, 120, .06);
+  --radius: 14px;
 }
 
-header {
-  background-color: #005f73;
-  color: white;
-  padding: 20px;
+/* ---------- Modo oscuro (alto contraste) ---------- */
+body.dark{
+  --bg: #0b1324;
+  --card: #0f1b2e;
+  --text: #eaf2ff;
+  --muted: #b6c3d7;
+  --border: #1f3b59;
+  --tm-blue: #3fc2ff;
+  --tm-blue-dark: #2fb0ec;
+  --tm-blue-100: #0b2540;
+  --shadow: 0 10px 24px rgba(0,0,0,.45);
+}
+
+/* ---------- Base ---------- */
+*{ box-sizing: border-box }
+html,body{ height:100% }
+body{
+  margin:0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+  line-height:1.5;
+}
+
+.page-wrap{ min-height:100%; display:flex; flex-direction:column; }
+
+/* ---------- Header ---------- */
+.tm-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px;
+  background: var(--card);
+  border-bottom: 3px solid var(--tm-blue);
+  position: sticky; top:0; z-index:10;
+}
+.brand{ display:flex; align-items:center; gap:12px; }
+.logo{ width:44px; height:44px; object-fit:contain; border-radius:10px; background:#fff; box-shadow: var(--shadow); }
+.tm-header h1{ margin:0; font-size: clamp(18px,2.4vw,24px); }
+.header-actions{ display:flex; align-items:center; gap:12px; }
+
+
+/* ---------- Header ---------- */
+.tm-footer{
   text-align: center;
 }
 
-main {
-  padding: 30px;
-}
+/* ---------- Contenedor ---------- */
+.tm-container{ width:min(1100px,94%); margin:24px auto; }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+/* ---------- Card principal ---------- */
+.card{
+  background: var(--card);
+  border: 3px solid var(--tm-blue);  /* << requisito TalMatch */
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding:16px;
 }
+.card h2{ margin:4px 0 16px; font-size: clamp(18px,2.3vw,22px); }
 
-thead {
-  background-color: #0a9396;
-  color: white;
+/* ---------- Toolbar ---------- */
+.toolbar{ display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; margin-bottom:12px; }
+.control{ display:flex; flex-direction:column; min-width:220px; }
+.control label{ font-weight:600; margin-bottom:6px; }
+.control select,
+.control input[type="search"]{
+  padding:10px 12px; border:2px solid var(--tm-blue); border-radius:12px;
+  background:#fff; color:var(--text); outline:none;
 }
-
-thead th, tbody td {
-  padding: 15px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
+.control select:focus,
+.control input[type="search"]:focus{
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tm-blue) 25%, transparent);
+  background: var(--tm-blue-100);
 }
+.grow{ flex:1 1 280px; }
+.actions{ display:flex; gap:8px; }
 
-a.verchat {
-  background-color: #005f73;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 5px;
-  text-decoration: none;
+/* ---------- Resumen ---------- */
+.summary{ color: var(--muted); display:flex; align-items:center; gap:8px; margin: 6px 0 14px; }
+.dot{ opacity:.5; }
+
+/* ---------- Tabla ---------- */
+.table-wrap{ width:100%; overflow-x:auto; }
+.table{ width:100%; border-collapse: collapse; }
+.table thead th{
+  text-align:left; font-weight:600; font-size:14px; color:var(--muted);
+  padding:10px 8px; border-bottom:2px solid var(--tm-blue);
 }
-
-a.verchat:hover {
-  background-color: #003845;
+.table tbody td{
+  padding:14px 8px; border-bottom:1.5px dashed var(--border); vertical-align:top;
 }
+.table tbody td.empty{ text-align:center; color:var(--muted); padding:18px 8px; }
+.col-acciones{ width:300px; }
 
-span.pendiente {
-  color: #aaa;
-  font-style: italic;
+.person strong{ display:block; }
+.muted{ color: var(--muted); font-size:12px; }
+
+/* ---------- Píldoras de estado ---------- */
+.pill{
+  display:inline-block; padding:4px 12px; border-radius:999px; font-size:12px;
+  border:2px solid var(--tm-blue); background:#fff; color: var(--tm-blue-dark);
+}
+.pill.pendiente{ border-color:#facc15; background:#fffbea; color:#7a5d00; }
+.pill.aceptada{ border-color: var(--tm-blue); background:#e7f3ff; color:#0f5d9c; }
+.pill.rechazada{ border-color:#ef4444; background:#ffe9eb; color:#8f1f25; }
+.pill.contratado{ border-color:#22c55e; background:#e7fbe9; color:#146b2b; }
+
+/* ---------- Acciones ---------- */
+.acciones{ display:flex; flex-wrap:wrap; gap:8px; }
+
+/* ---------- Botones ---------- */
+.btn{
+  appearance:none; border:2px solid var(--tm-blue); background:#fff; color: var(--tm-blue-dark);
+  padding:10px 14px; border-radius:12px; font-weight:600; cursor:pointer;
+  transition: transform .04s ease, background .2s ease, filter .2s ease, color .2s ease, border-color .2s ease;
+}
+.btn:active{ transform: translateY(1px); }
+.btn-primary{ background: var(--tm-blue); color:#fff; border-color: var(--tm-blue-dark); box-shadow: 0 4px 10px rgba(0,170,255,.25); }
+.btn-primary:hover{ filter:brightness(1.05); }
+.btn-secondary{ background:#fff; color: var(--tm-blue-dark); }
+.btn-secondary:hover{ background: var(--tm-blue-100); }
+.btn-ghost{ border-color: var(--border); color: var(--muted); }
+.btn-ghost:hover{ color: var(--text); background: var(--tm-blue-100); }
+
+/* ---------- Toast ---------- */
+.toast{
+  position:fixed; right:16px; top:78px; background:var(--card); color:var(--text);
+  border:2px solid var(--tm-blue); border-radius:12px; padding:10px 14px; box-shadow: var(--shadow);
+  opacity:0; pointer-events:none; transform:translateY(-8px); transition: opacity .2s, transform .2s; z-index:20;
+}
+.toast.show{ opacity:1; pointer-events:auto; transform:translateY(0); }
+
+/* ---------- Toggle tema ---------- */
+.theme-toggle{ display:inline-flex; align-items:center; gap:10px; user-select:none; }
+.theme-toggle input{ display:none; }
+.theme-label{ font-size:14px; color: var(--muted); }
+.slider{
+  width:44px; height:24px; border-radius:999px; background:#c7e5ff; position:relative; border:2px solid var(--tm-blue);
+}
+.slider::after{
+  content:""; position:absolute; top:50%; left:2px; translate:0 -50%;
+  width:20px; height:20px; border-radius:50%; background:#fff; border:2px solid var(--tm-blue); box-shadow: var(--shadow); transition:left .2s;
+}
+input:checked + .slider{ background: var(--tm-blue); border-color: var(--tm-blue-dark); }
+input:checked + .slider::after{ left:22px; }
+
+/* ---------- DARK: ajustes extra ---------- */
+body.dark .table thead th{ color: var(--muted); border-bottom-color: var(--tm-blue); }
+body.dark .table tbody td{ border-bottom-color: var(--border); }
+
+@media (max-width: 780px){
+  .col-acciones{ width:auto; }
+  .table thead{ display:none; }
+  .table, .table tbody, .table tr, .table td{ display:block; width:100%; }
+  .table tr{
+    border: 2px solid var(--tm-blue);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    padding: 10px;
+    background:#fff;
+    box-shadow: var(--shadow);
+  }
+  .table tbody td{ border:none; padding:6px 0; }
+  .table tbody td::before{
+    content: attr(data-label) ": ";
+    font-weight:700; color: var(--muted);
+  }
+  .acciones{ margin-top:8px; }
 }

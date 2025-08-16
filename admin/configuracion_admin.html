@@ -1,105 +1,507 @@
-<!-- configuracion_admin.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Configuración - Admin</title>
-  <link rel="stylesheet" href="inicio_admin.css">
-  <link rel="stylesheet" href="modo_oscuro.css">
-  <style>
-    form {
-      max-width: 500px;
-      margin: 30px auto;
-      background-color: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
+  <!-- ================== Metadatos ================== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>TalMatch – Configuración General</title>
 
-    label {
-      display: block;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
+  <!-- ================== Estilos ================== -->
+  <link rel="stylesheet" href="configuracion_admin.css"/>
 
-    input[type="text"], select {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    input[type="submit"] {
-      background-color: #1a73e8;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    input[type="submit"]:hover {
-      background-color: #0f5cc0;
-    }
-  </style>
+  <!-- Fuente coherente con el proyecto -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <h1>Configuración del Sistema</h1>
-    <nav>
-      <ul>
-        <li><a href="inicio_admin.html">Volver al Panel</a></li>
-        <button id="modoOscuroBtn">🌙 Modo Oscuro</button>
-      </ul>
-    </nav>
-  </header>
+  <!-- =========================================================
+       CONTENEDOR GENERAL (estructura completa)
+  ========================================================== -->
+  <div class="page-wrap">
 
-  <main>
-    <form>
-      <label for="nombre-sitio">Nombre del sistema</label>
-      <input type="text" id="nombre-sitio" name="nombre-sitio" value="TalMatch">
+    <!-- ================== HEADER SUPERIOR ================== -->
+    <header class="tm-header">
+      <div class="brand">
+        <img src="/imagenes/talmach.jpg" alt="TalMatch" class="logo">
+        <h1>Configuración de la plataforma</h1>
+      </div>
 
-      <label for="matching">Matching automático</label>
-      <select id="matching" name="matching">
-        <option value="on" selected>Activado</option>
-        <option value="off">Desactivado</option>
-      </select>
+      <div class="header-actions">
+        <a href="inicio_admin.html" class="btn btn-secondary">← Volver</a>
 
-      <label for="logo">Cambiar logo (simulado)</label>
-      <input type="text" id="logo" name="logo" placeholder="URL del nuevo logo">
+        <!-- Toggle de modo oscuro (persistente en localStorage) -->
+        <label class="theme-toggle">
+          <input id="themeSwitch" type="checkbox" aria-label="Activar modo oscuro">
+          <span class="slider"></span>
+          <span class="theme-label">Modo oscuro</span>
+        </label>
+      </div>
+    </header>
 
+    <!-- ================== CONTENIDO PRINCIPAL ================== -->
+    <main class="tm-container">
+      <!-- Toast de feedback -->
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+      <!--
+        CARD PRINCIPAL
+        ⚠️ Requisito visual: borde azul TalMatch 3px
+      -->
+      <section class="card">
 
+        <!-- ================== Pestañas de navegación local ================== -->
+        <nav class="tabs" aria-label="Secciones de configuración">
+          <button class="tab active" data-tab="general">General</button>
+          <button class="tab" data-tab="seguridad">Seguridad</button>
+          <button class="tab" data-tab="notificaciones">Notificaciones</button>
+          <button class="tab" data-tab="catalogo">Catálogo</button>
+        </nav>
 
-      <input type="submit" value="Guardar cambios">
-    </form>
-  </main>
+        <!-- ========== Sección: GENERAL ========== -->
+        <section id="tab-general" class="panel show" aria-labelledby="General">
+          <h2>General</h2>
 
+          <form id="formGeneral" class="grid-2" autocomplete="off">
+            <!-- Nombre de la plataforma -->
+            <div class="form-group">
+              <label for="nombrePlataforma">Nombre de la plataforma</label>
+              <input id="nombrePlataforma" type="text" placeholder="Ej. TalMatch" required>
+              <small class="hint">Se muestra en el título y en correos.</small>
+            </div>
 
-  
-<!-- FUNICIONALIDAD MODO OSCURO-->    
-    <script>
-  const btnModo = document.getElementById('modoOscuroBtn');
-  const root = document.documentElement;
+            <!-- Idioma -->
+            <div class="form-group">
+              <label for="idioma">Idioma por defecto</label>
+              <select id="idioma">
+                <option value="es">Español</option>
+                <option value="en">Inglés</option>
+              </select>
+              <small class="hint">Puedes activar multidioma más adelante.</small>
+            </div>
 
-  // Cargar desde localStorage
-  if (localStorage.getItem('modoOscuro') === 'activo') {
-    document.documentElement.classList.add('dark-mode');
-    btnModo.textContent = '☀️ Modo Claro';
-  }
+            <!-- Zona horaria -->
+            <div class="form-group">
+              <label for="zona">Zona horaria</label>
+              <select id="zona">
+                <option value="America/Managua">America/Managua (GMT-6)</option>
+                <option value="America/Mexico_City">America/Mexico_City (GMT-6)</option>
+                <option value="America/Bogota">America/Bogota (GMT-5)</option>
+                <option value="UTC">UTC</option>
+              </select>
+              <small class="hint">Afecta sellos de tiempo y reportes.</small>
+            </div>
 
-  btnModo.addEventListener('click', () => {
-    document.documentElement.classList.toggle('dark-mode');
-    const activo = document.documentElement.classList.contains('dark-mode');
-    btnModo.textContent = activo ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
-    localStorage.setItem('modoOscuro', activo ? 'activo' : 'inactivo');
-  });
-</script>
+            <!-- Logo -->
+            <div class="form-group">
+              <label for="logo">Logo (URL)</label>
+              <input id="logo" type="url" placeholder="">
+              <small class="hint">Pega la URL del logo público. (En demo)</small>
+            </div>
+          </form>
 
+          <div class="preview">
+            <div class="preview-card">
+              <div class="prev-brand">
+                <img  src="/imagenes/talmach.jpg" alt="Logo previsualización">
+                <div>
+                  <strong id="prevNombre">TalMatch</strong>
+                  <div class="muted" id="prevIdioma">Idioma: Español</div>
+                </div>
+              </div>
+              <div class="muted" id="prevZona">Zona horaria: America/Managua</div>
+            </div>
+          </div>
 
+          <!-- Acciones -->
+          <div class="form-actions">
+            <button id="btnGuardarGeneral" class="btn btn-primary" type="button">Guardar</button>
+            <button id="btnResetGeneral" class="btn btn-ghost" type="button">Reestablecer</button>
+          </div>
+        </section>
 
+        <!-- ========== Sección: SEGURIDAD ========== -->
+        <section id="tab-seguridad" class="panel" aria-labelledby="Seguridad">
+          <h2>Seguridad</h2>
+
+          <form id="formSeguridad" class="grid-2" autocomplete="off">
+            <!-- Verificación por email -->
+            <div class="form-group">
+              <label class="switch-row">
+                <input id="reqVerifEmail" type="checkbox">
+                <span class="switch"></span>
+                <span>Requerir verificación de correo para activar cuenta</span>
+              </label>
+              <small class="hint">Usuarios deben confirmar su correo antes de usar el sistema.</small>
+            </div>
+
+            <!-- 2FA -->
+            <div class="form-group">
+              <label class="switch-row">
+                <input id="req2FA" type="checkbox">
+                <span class="switch"></span>
+                <span>Habilitar 2FA (Google Authenticator / Email OTP)</span>
+              </label>
+              <small class="hint">Se pedirá código extra al iniciar sesión.</small>
+            </div>
+
+            <!-- Longitud mínima de contraseña -->
+            <div class="form-group">
+              <label for="minPass">Longitud mínima de contraseña</label>
+              <input id="minPass" type="number" min="6" max="64" step="1" value="8">
+              <small class="hint">Recomendado: 8 o más.</small>
+            </div>
+
+            <!-- Tiempo de sesión -->
+            <div class="form-group">
+              <label for="sessionMin">Tiempo de sesión (minutos)</label>
+              <input id="sessionMin" type="number" min="5" max="720" step="5" value="60">
+              <small class="hint">Se cerrará la sesión después de inactividad.</small>
+            </div>
+
+            <!-- Política de intentos -->
+            <div class="form-group">
+              <label for="intentos">Intentos fallidos antes de bloqueo</label>
+              <input id="intentos" type="number" min="3" max="10" step="1" value="5">
+              <small class="hint">Bloqueo temporal para evitar fuerza bruta.</small>
+            </div>
+
+            <!-- Enmascarar emails a empresas -->
+            <div class="form-group">
+              <label class="switch-row">
+                <input id="maskEmail" type="checkbox">
+                <span class="switch"></span>
+                <span>Enmascarar correos de candidatos a empresas (relay)</span>
+              </label>
+              <small class="hint">Mejora privacidad en el primer contacto.</small>
+            </div>
+          </form>
+
+          <div class="form-actions">
+            <button id="btnGuardarSeguridad" class="btn btn-primary" type="button">Guardar</button>
+            <button id="btnResetSeguridad" class="btn btn-ghost" type="button">Reestablecer</button>
+          </div>
+        </section>
+
+        <!-- ========== Sección: NOTIFICACIONES ========== -->
+        <section id="tab-notificaciones" class="panel" aria-labelledby="Notificaciones">
+          <h2>Notificaciones</h2>
+
+          <form id="formNotificaciones" class="grid-2" autocomplete="off">
+            <!-- Remitente -->
+            <div class="form-group">
+              <label for="remitente">Correo remitente</label>
+              <input id="remitente" type="email" placeholder="notificaciones@talmatch.com">
+              <small class="hint">Dirección usada para notificaciones salientes.</small>
+            </div>
+
+            <!-- Nombre remitente -->
+            <div class="form-group">
+              <label for="remitenteNombre">Nombre remitente</label>
+              <input id="remitenteNombre" type="text" placeholder="TalMatch Notificaciones">
+            </div>
+
+            <!-- Plantilla: nuevo match -->
+            <div class="form-group span-2">
+              <label for="tplMatch">Plantilla: Nuevo match</label>
+              <textarea id="tplMatch" rows="5" placeholder="[Asunto] ¡Tienes un nuevo match!&#10;Hola {{nombre}}, coincidiste con {{empresa}}."></textarea>
+              <small class="hint">Variables disponibles: <code>{{nombre}}</code>, <code>{{empresa}}</code>, <code>{{puesto}}</code>.</small>
+            </div>
+
+            <!-- Plantilla: restablecer contraseña -->
+            <div class="form-group span-2">
+              <label for="tplReset">Plantilla: Restablecer contraseña</label>
+              <textarea id="tplReset" rows="4" placeholder="[Asunto] Restablece tu contraseña&#10;Hola {{nombre}}, usa este enlace: {{enlace}}"></textarea>
+              <small class="hint">Variables: <code>{{nombre}}</code>, <code>{{enlace}}</code>.</small>
+            </div>
+          </form>
+
+          <div class="form-actions">
+            <button id="btnGuardarNoti" class="btn btn-primary" type="button">Guardar</button>
+            <button id="btnResetNoti" class="btn btn-ghost" type="button">Reestablecer</button>
+          </div>
+        </section>
+
+        <!-- ========== Sección: CATÁLOGO ========== -->
+        <section id="tab-catalogo" class="panel" aria-labelledby="Catálogo">
+          <h2>Catálogo</h2>
+
+          <div class="grid-2">
+            <!-- Chips de habilidades -->
+            <div class="form-group span-2">
+              <label>Habilidades (etiquetas rápidas)</label>
+              <ul id="chips" class="chips"><!-- dinámico --></ul>
+            </div>
+
+            <!-- Agregar nueva etiqueta -->
+            <div class="form-group">
+              <label for="nuevaHab">Añadir habilidad</label>
+              <input id="nuevaHab" type="text" placeholder="Ej. Docker">
+              <small class="hint">Presiona “Agregar” para incluirla al catálogo.</small>
+            </div>
+
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <button id="btnAgregarHab" class="btn btn-secondary" type="button">Agregar</button>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button id="btnGuardarCatalogo" class="btn btn-primary" type="button">Guardar</button>
+            <button id="btnResetCatalogo" class="btn btn-ghost" type="button">Reestablecer</button>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <!-- ================== FOOTER ================== -->
+    <footer class="tm-footer">
+      <small>© TalMatch · Configuración</small>
+    </footer>
+  </div>
+
+  <!-- =========================================================
+       JS DEMO (sin backend) con localStorage
+       - Persistencia de cada sección
+       - Navegación por pestañas
+       - Previsualización de nombre/logo/idioma/zona
+  ========================================================== -->
+  <script>
+    // ---- Claves de almacenamiento
+    const KEY_THEME = "talmatch_theme";
+    const KEY_CFG_GENERAL = "talmatch_cfg_general";
+    const KEY_CFG_SEC = "talmatch_cfg_seguridad";
+    const KEY_CFG_NOTI = "talmatch_cfg_notificaciones";
+    const KEY_CFG_CAT = "talmatch_cfg_catalogo";
+
+    // ---- Refs generales
+    const themeSwitch = document.getElementById('themeSwitch');
+    const toast = document.getElementById('toast');
+
+    // ---- Tabs
+    document.querySelectorAll('.tab').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.tab').forEach(b=> b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p=> p.classList.remove('show'));
+        btn.classList.add('active');
+        document.getElementById('tab-'+btn.dataset.tab).classList.add('show');
+      });
+    });
+
+    // ---- Tema persistente
+    (function initTheme(){
+      const saved = localStorage.getItem(KEY_THEME) || "light";
+      if (saved === "dark") { document.body.classList.add("dark"); themeSwitch.checked = true; }
+      themeSwitch.addEventListener("change", ()=>{
+        document.body.classList.toggle("dark", themeSwitch.checked);
+        localStorage.setItem(KEY_THEME, themeSwitch.checked ? "dark" : "light");
+      });
+    })();
+
+    // ---- Helpers
+    const showToast = (msg, type="success")=>{
+      toast.textContent = msg;
+      toast.className = `toast ${type} show`;
+      setTimeout(()=> toast.classList.remove('show'), 1800);
+    };
+    const get = (k, fallback) => {
+      try { return JSON.parse(localStorage.getItem(k) || "null") ?? fallback; }
+      catch { return fallback; }
+    };
+    const put = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
+    /* ================== GENERAL ================== */
+    const nombrePlataforma = document.getElementById('nombrePlataforma');
+    const idioma = document.getElementById('idioma');
+    const zona = document.getElementById('zona');
+    const logo = document.getElementById('logo');
+
+    const prevLogo = document.getElementById('prevLogo');
+    const prevNombre = document.getElementById('prevNombre');
+    const prevIdioma = document.getElementById('prevIdioma');
+    const prevZona = document.getElementById('prevZona');
+
+    const btnGuardarGeneral = document.getElementById('btnGuardarGeneral');
+    const btnResetGeneral = document.getElementById('btnResetGeneral');
+
+    function loadGeneral(){
+      const g = get(KEY_CFG_GENERAL, {
+        nombre: "TalMatch",
+        idioma: "es",
+        zona: "America/Managua",
+        logo: ""
+      });
+      nombrePlataforma.value = g.nombre;
+      idioma.value = g.idioma;
+      zona.value = g.zona;
+      logo.value = g.logo || "";
+      renderPreviewGeneral();
+    }
+
+    function renderPreviewGeneral(){
+      prevNombre.textContent = nombrePlataforma.value || "TalMatch";
+      prevIdioma.textContent = "Idioma: " + (idioma.value === "en" ? "Inglés" : "Español");
+      prevZona.textContent = "Zona horaria: " + zona.value;
+      if (logo.value) prevLogo.src = logo.value; else prevLogo.src = "imagenes/talmach.jpg";
+    }
+
+    nombrePlataforma.addEventListener('input', renderPreviewGeneral);
+    idioma.addEventListener('change', renderPreviewGeneral);
+    zona.addEventListener('change', renderPreviewGeneral);
+    logo.addEventListener('input', renderPreviewGeneral);
+
+    btnGuardarGeneral.addEventListener('click', ()=>{
+      put(KEY_CFG_GENERAL, {
+        nombre: nombrePlataforma.value.trim() || "TalMatch",
+        idioma: idioma.value,
+        zona: zona.value,
+        logo: logo.value.trim()
+      });
+      showToast("Configuración general guardada.", "success");
+    });
+    btnResetGeneral.addEventListener('click', ()=>{
+      localStorage.removeItem(KEY_CFG_GENERAL);
+      loadGeneral();
+      showToast("General reestablecido.", "info");
+    });
+
+    /* ================== SEGURIDAD ================== */
+    const reqVerifEmail = document.getElementById('reqVerifEmail');
+    const req2FA = document.getElementById('req2FA');
+    const minPass = document.getElementById('minPass');
+    const sessionMin = document.getElementById('sessionMin');
+    const intentos = document.getElementById('intentos');
+    const maskEmail = document.getElementById('maskEmail');
+
+    const btnGuardarSeguridad = document.getElementById('btnGuardarSeguridad');
+    const btnResetSeguridad = document.getElementById('btnResetSeguridad');
+
+    function loadSeguridad(){
+      const s = get(KEY_CFG_SEC, {
+        verifEmail: true, twoFA: false, minPass: 8, session: 60, intentos: 5, maskEmail: true
+      });
+      reqVerifEmail.checked = !!s.verifEmail;
+      req2FA.checked = !!s.twoFA;
+      minPass.value = s.minPass;
+      sessionMin.value = s.session;
+      intentos.value = s.intentos;
+      maskEmail.checked = !!s.maskEmail;
+    }
+    btnGuardarSeguridad.addEventListener('click', ()=>{
+      put(KEY_CFG_SEC, {
+        verifEmail: reqVerifEmail.checked,
+        twoFA: req2FA.checked,
+        minPass: Math.max(6, parseInt(minPass.value||"8",10)),
+        session: Math.max(5, parseInt(sessionMin.value||"60",10)),
+        intentos: Math.max(3, parseInt(intentos.value||"5",10)),
+        maskEmail: maskEmail.checked
+      });
+      showToast("Seguridad guardada.", "success");
+    });
+    btnResetSeguridad.addEventListener('click', ()=>{
+      localStorage.removeItem(KEY_CFG_SEC);
+      loadSeguridad();
+      showToast("Seguridad reestablecida.", "info");
+    });
+
+    /* ================== NOTIFICACIONES ================== */
+    const remitente = document.getElementById('remitente');
+    const remitenteNombre = document.getElementById('remitenteNombre');
+    const tplMatch = document.getElementById('tplMatch');
+    const tplReset = document.getElementById('tplReset');
+
+    const btnGuardarNoti = document.getElementById('btnGuardarNoti');
+    const btnResetNoti = document.getElementById('btnResetNoti');
+
+    function loadNoti(){
+      const n = get(KEY_CFG_NOTI, {
+        from: "notificaciones@talmatch.com",
+        fromName: "TalMatch Notificaciones",
+        tplMatch: "[Asunto] ¡Tienes un nuevo match!\nHola {{nombre}}, coincidiste con {{empresa}}.",
+        tplReset: "[Asunto] Restablece tu contraseña\nHola {{nombre}}, usa este enlace: {{enlace}}"
+      });
+      remitente.value = n.from;
+      remitenteNombre.value = n.fromName;
+      tplMatch.value = n.tplMatch;
+      tplReset.value = n.tplReset;
+    }
+    btnGuardarNoti.addEventListener('click', ()=>{
+      put(KEY_CFG_NOTI, {
+        from: remitente.value.trim(),
+        fromName: remitenteNombre.value.trim(),
+        tplMatch: tplMatch.value,
+        tplReset: tplReset.value
+      });
+      showToast("Notificaciones guardadas.", "success");
+    });
+    btnResetNoti.addEventListener('click', ()=>{
+      localStorage.removeItem(KEY_CFG_NOTI);
+      loadNoti();
+      showToast("Notificaciones reestablecidas.", "info");
+    });
+
+    /* ================== CATÁLOGO ================== */
+    const chips = document.getElementById('chips');
+    const nuevaHab = document.getElementById('nuevaHab');
+    const btnAgregarHab = document.getElementById('btnAgregarHab');
+    const btnGuardarCatalogo = document.getElementById('btnGuardarCatalogo');
+    const btnResetCatalogo = document.getElementById('btnResetCatalogo');
+
+    let habilidades = [];
+
+    function renderChips(){
+      chips.innerHTML = "";
+      if (!habilidades.length){
+        const li = document.createElement('li');
+        li.className = "muted";
+        li.textContent = "Sin habilidades en el catálogo.";
+        chips.appendChild(li);
+        return;
+      }
+      for(const h of habilidades){
+        const li = document.createElement('li');
+        li.className = "chip";
+        li.innerHTML = `<span>${h}</span><button class="chip-del" title="Quitar" data-h="${h}">×</button>`;
+        chips.appendChild(li);
+      }
+    }
+    function loadCatalogo(){
+      const cat = get(KEY_CFG_CAT, { skills: ["Soporte técnico","Redes","Excel","Atención al cliente"] });
+      habilidades = cat.skills;
+      renderChips();
+    }
+    chips.addEventListener('click', (ev)=>{
+      const btn = ev.target.closest('.chip-del');
+      if(!btn) return;
+      const h = btn.dataset.h;
+      habilidades = habilidades.filter(x => x !== h);
+      renderChips();
+    });
+    btnAgregarHab.addEventListener('click', ()=>{
+      const val = (nuevaHab.value||"").trim();
+      if(!val) return;
+      if(!habilidades.includes(val)){
+        habilidades.push(val);
+        renderChips();
+        nuevaHab.value = "";
+      }
+    });
+    btnGuardarCatalogo.addEventListener('click', ()=>{
+      put(KEY_CFG_CAT, { skills: habilidades });
+      showToast("Catálogo guardado.", "success");
+    });
+    btnResetCatalogo.addEventListener('click', ()=>{
+      localStorage.removeItem(KEY_CFG_CAT);
+      loadCatalogo();
+      showToast("Catálogo reestablecido.", "info");
+    });
+
+    /* ================== INIT ================== */
+    (function init(){
+      loadGeneral();
+      loadSeguridad();
+      loadNoti();
+      loadCatalogo();
+    })();
+  </script>
 </body>
-
-
 </html>

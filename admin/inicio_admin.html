@@ -1,79 +1,325 @@
-<!-- inicio_admin.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TalMatch - Panel de Administración</title>
-  <link rel="stylesheet" href="inicio_admin.css">
-  <link rel="stylesheet" href="modo_oscuro.css">
+  <!-- ===== Meta ===== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>TalMatch – Panel Admin</title>
+
+  <!-- ===== Estilos ===== -->
+  <link rel="stylesheet" href="inicio_admin.css"/>
+
+  <!-- Fuente coherente -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <h1>TalMatch - Panel Administrador</h1>
-    <nav>
-      <ul>
-        <li><a href="estadisticas_admin.html">Estadísticas</a></li>
-        <li><a href="usuarios_admin.html">Usuarios</a></li>
-        <li><a href="empresas_admin.html">Empresas</a></li>
-        <li><a href="emparejamientos_admin.html">Emparejamientos</a></li>
-        <li><a href="configuracion_admin.html">Configuración</a></li>
-        <li><a href="//127.0.0.1:5500/login.html">Cerrar sesión</a></li>
-      </ul>
-    </nav>
-  </header>
+  <div class="page-wrap">
+    <!-- ===== Header superior ===== -->
+    <header class="tm-header">
+      <div class="brand">
+        <img src="/imagenes/talmach.jpg" alt="TalMatch" class="logo">
+        <h1>Panel de administración</h1>
+      </div>
 
-  <main>
-    <section class="bienvenida">
-      <h2>Bienvenido, Administrador</h2>
-      <p>Desde aquí puedes controlar toda la plataforma.</p>
-    </section>
+      <div class="header-actions">
+        <a href="index.html" class="btn btn-secondary">← Volver</a>
 
-    <section class="panel-resumen">
-      <div class="tarjeta">
-        <h3>Estudiantes</h3>
-        <p>158 registrados</p>
+        <!-- Toggle modo oscuro -->
+        <label class="theme-toggle">
+          <input id="themeSwitch" type="checkbox" aria-label="Activar modo oscuro">
+          <span class="slider"></span>
+          <span class="theme-label">Modo oscuro</span>
+        </label>
       </div>
-      <div class="tarjeta">
-        <h3>Empresas</h3>
-        <p>42 activas</p>
-      </div>
-      <div class="tarjeta">
-        <h3>Emparejamientos</h3>
-        <p>67 coincidencias</p>
-      </div>
-      <div class="tarjeta">
-        <h3>Reportes</h3>
-        <p>3 sin revisar</p>
-      </div>
-    </section>
-  </main>
+    </header>
 
-  <footer>
-    <p>&copy; 2025 TalMatch | Plataforma de conexión profesional</p>
-  </footer>
+    <!-- ===== Contenido principal ===== -->
+    <main class="tm-container">
+
+      <!-- Toast para feedback -->
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+      <!-- ===== Módulo: Métricas rápidas ===== -->
+      <section class="card metrics">
+        <div class="metric">
+          <div class="m-title">Usuarios</div>
+          <div id="mUsuarios" class="m-value">0</div>
+          <div class="m-sub muted">+12 esta semana</div>
+        </div>
+        <div class="metric">
+          <div class="m-title">Empresas</div>
+          <div id="mEmpresas" class="m-value">0</div>
+          <div class="m-sub muted">3 por verificar</div>
+        </div>
+        <div class="metric">
+          <div class="m-title">Matches</div>
+          <div id="mMatches" class="m-value">0</div>
+          <div class="m-sub muted">últimos 30 días</div>
+        </div>
+        <div class="metric">
+          <div class="m-title">Reportes</div>
+          <div id="mReportes" class="m-value warn">0</div>
+          <div class="m-sub muted">pendientes</div>
+        </div>
+
+        <div class="metrics-actions">
+          <button id="btnCargarDemo" class="btn btn-ghost">Cargar demo</button>
+          <button id="btnReset" class="btn btn-ghost">Reiniciar</button>
+        </div>
+      </section>
+
+      <!-- ===== Módulo: Verificaciones pendientes (empresas) ===== -->
+      <section class="card">
+        <div class="card-head">
+          <h2>Verificaciones de empresas pendientes</h2>
+          <div class="tools">
+            <input id="buscaEmp" class="input" type="search" placeholder="Buscar empresa...">
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Empresa</th>
+                <th>Rubro</th>
+                <th>Solicitud</th>
+                <th>Fecha</th>
+                <th class="col-acciones">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyEmpresas">
+              <!-- filas demo via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== Módulo: Reportes de contenido ===== -->
+      <section class="card">
+        <div class="card-head">
+          <h2>Reportes de contenido</h2>
+          <div class="tools">
+            <select id="filtroTipo" class="input">
+              <option value="TODOS">Todos</option>
+              <option value="PERFIL">Perfil</option>
+              <option value="OFERTA">Oferta</option>
+              <option value="MENSAJE">Mensaje</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Referencia</th>
+                <th>Motivo</th>
+                <th>Fecha</th>
+                <th class="col-acciones">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyReportes">
+              <!-- filas demo via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="tm-footer">
+      <small>© TalMatch · Admin</small>
+    </footer>
+  </div>
+
+  <!-- ===== JS demo sin backend ===== -->
+  <script>
+    // Claves localStorage
+    const KEY_THEME = "talmatch_theme";
+    const KEY_ADMIN_EMP = "talmatch_admin_empresas_pend";
+    const KEY_ADMIN_REP = "talmatch_admin_reportes";
+    const KEY_ADMIN_M = "talmatch_admin_metrics";
+
+    // Refs
+    const themeSwitch = document.getElementById('themeSwitch');
+    const toast = document.getElementById('toast');
+    const mUsuarios = document.getElementById('mUsuarios');
+    const mEmpresas = document.getElementById('mEmpresas');
+    const mMatches = document.getElementById('mMatches');
+    const mReportes = document.getElementById('mReportes');
+    const tbodyEmpresas = document.getElementById('tbodyEmpresas');
+    const tbodyReportes = document.getElementById('tbodyReportes');
+    const buscaEmp = document.getElementById('buscaEmp');
+    const filtroTipo = document.getElementById('filtroTipo');
+    const btnCargarDemo = document.getElementById('btnCargarDemo');
+    const btnReset = document.getElementById('btnReset');
+
+    // Tema
+    (function initTheme(){
+      const saved = localStorage.getItem(KEY_THEME) || "light";
+      if (saved === "dark") { document.body.classList.add("dark"); themeSwitch.checked = true; }
+      themeSwitch.addEventListener("change", ()=>{
+        document.body.classList.toggle("dark", themeSwitch.checked);
+        localStorage.setItem(KEY_THEME, themeSwitch.checked ? "dark" : "light");
+      });
+    })();
+
+    // Utilities
+    const showToast = (msg,type="info")=>{
+      toast.textContent = msg; toast.className = `toast ${type} show`;
+      setTimeout(()=> toast.classList.remove("show"), 1800);
+    };
+    const fmt = (iso)=> {
+      const d = new Date(iso);
+      return d.toLocaleDateString();
+    };
+
+    // Demo data
+    function seedMetrics(){ return { usuarios: 324, empresas: 48, matches: 112, reportes: 3 }; }
+    function seedEmpresas(){
+      return [
+        { id:"E-1001", nombre:"TecnoMasaya S.A.", rubro:"Software", solicitud:"Verificación de identidad", fecha:"2025-08-05" },
+        { id:"E-1002", nombre:"AgroNica", rubro:"Agroindustria", solicitud:"Validación de RUC", fecha:"2025-08-04" },
+        { id:"E-1003", nombre:"BlueCloud", rubro:"Cloud & Infra", solicitud:"Revisión documento legal", fecha:"2025-08-02" },
+      ];
+    }
+    function seedReportes(){
+      return [
+        { id:"R-9001", tipo:"PERFIL", ref:"U-0009", motivo:"Información engañosa", fecha:"2025-08-06" },
+        { id:"R-9002", tipo:"OFERTA", ref:"O-0451", motivo:"Lenguaje inapropiado", fecha:"2025-08-05" },
+        { id:"R-9003", tipo:"MENSAJE", ref:"T-1022", motivo:"Spam", fecha:"2025-08-03" },
+      ];
+    }
+
+    // Estado
+    let metrics = { usuarios:0, empresas:0, matches:0, reportes:0 };
+    let empresas = [];
+    let reportes = [];
+
+    // Persistencia
+    function saveAll(){
+      localStorage.setItem(KEY_ADMIN_M, JSON.stringify(metrics));
+      localStorage.setItem(KEY_ADMIN_EMP, JSON.stringify(empresas));
+      localStorage.setItem(KEY_ADMIN_REP, JSON.stringify(reportes));
+    }
+    function loadAll(){
+      try { metrics = JSON.parse(localStorage.getItem(KEY_ADMIN_M) || "null") || metrics; } catch {}
+      try { empresas = JSON.parse(localStorage.getItem(KEY_ADMIN_EMP) || "[]"); } catch { empresas=[]; }
+      try { reportes = JSON.parse(localStorage.getItem(KEY_ADMIN_REP) || "[]"); } catch { reportes=[]; }
+    }
+
+    // Render
+    function renderMetrics(){
+      mUsuarios.textContent = metrics.usuarios;
+      mEmpresas.textContent = metrics.empresas;
+      mMatches.textContent = metrics.matches;
+      mReportes.textContent = metrics.reportes;
+    }
+
+    function renderEmpresas(){
+      const q = (buscaEmp.value||"").toLowerCase().trim();
+      const data = empresas.filter(e=> e.nombre.toLowerCase().includes(q));
+      tbodyEmpresas.innerHTML = "";
+      if(!data.length){
+        tbodyEmpresas.innerHTML = `<tr><td class="empty" colspan="5">No hay verificaciones pendientes.</td></tr>`;
+        return;
+      }
+      for(const e of data){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td data-label="Empresa"><strong>${e.nombre}</strong><div class="muted">ID: ${e.id}</div></td>
+          <td data-label="Rubro">${e.rubro}</td>
+          <td data-label="Solicitud">${e.solicitud}</td>
+          <td data-label="Fecha">${fmt(e.fecha)}</td>
+          <td data-label="Acciones" class="acciones">
+            <button class="btn btn-primary" data-id="${e.id}" data-act="aprobar">Aprobar</button>
+            <button class="btn btn-secondary" data-id="${e.id}" data-act="rechazar">Rechazar</button>
+            <a class="btn btn-ghost" href="vempresa.html">Ver perfil</a>
+          </td>`;
+        tbodyEmpresas.appendChild(tr);
+      }
+    }
+
+    function renderReportes(){
+      const tipo = filtroTipo.value;
+      const data = reportes.filter(r=> tipo==="TODOS" ? true : r.tipo===tipo);
+      tbodyReportes.innerHTML = "";
+      if(!data.length){
+        tbodyReportes.innerHTML = `<tr><td class="empty" colspan="5">Sin reportes.</td></tr>`;
+        return;
+      }
+      for(const r of data){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td data-label="Tipo">${r.tipo}</td>
+          <td data-label="Referencia">${r.ref}</td>
+          <td data-label="Motivo">${r.motivo}</td>
+          <td data-label="Fecha">${fmt(r.fecha)}</td>
+          <td data-label="Acciones" class="acciones">
+            <button class="btn btn-secondary" data-id="${r.id}" data-act="archivar">Archivar</button>
+            <button class="btn btn-primary" data-id="${r.id}" data-act="suspender">Suspender</button>
+          </td>`;
+        tbodyReportes.appendChild(tr);
+      }
+    }
+
+    function renderAll(){ renderMetrics(); renderEmpresas(); renderReportes(); }
+
+    // Acciones
+    document.addEventListener("click", (ev)=>{
+      const t = ev.target.closest("button");
+      if(!t) return;
+      const id = t.dataset.id;
+      const act = t.dataset.act;
+
+      // Verificaciones
+      if(act==="aprobar" || act==="rechazar"){
+        empresas = empresas.filter(e=> e.id !== id);
+        metrics.empresas = Math.max(0, metrics.empresas - 1);
+        saveAll(); renderAll();
+        showToast(act==="aprobar" ? "Empresa aprobada." : "Solicitud rechazada.", act==="aprobar" ? "success" : "info");
+      }
+      // Reportes
+      if(act==="archivar"){
+        reportes = reportes.filter(r=> r.id !== id);
+        metrics.reportes = Math.max(0, metrics.reportes - 1);
+        saveAll(); renderAll();
+        showToast("Reporte archivado.", "success");
+      }
+      if(act==="suspender"){
+        reportes = reportes.filter(r=> r.id !== id);
+        metrics.reportes = Math.max(0, metrics.reportes - 1);
+        saveAll(); renderAll();
+        showToast("Cuenta/elemento suspendido.", "error");
+      }
+    });
+
+    // Controles
+    buscaEmp.addEventListener("input", renderEmpresas);
+    filtroTipo.addEventListener("change", renderReportes);
+
+    // Demo
+    btnCargarDemo.addEventListener("click", ()=>{
+      metrics = seedMetrics();
+      empresas = seedEmpresas();
+      reportes = seedReportes();
+      saveAll(); renderAll();
+      showToast("Datos de demo cargados.", "success");
+    });
+    btnReset.addEventListener("click", ()=>{
+      localStorage.removeItem(KEY_ADMIN_M);
+      localStorage.removeItem(KEY_ADMIN_EMP);
+      localStorage.removeItem(KEY_ADMIN_REP);
+      metrics = { usuarios:0, empresas:0, matches:0, reportes:0 };
+      empresas = []; reportes = [];
+      renderAll();
+      showToast("Demo reiniciada.", "info");
+    });
+
+    // Init
+    loadAll(); renderAll();
+  </script>
 </body>
-
-
-<!-- FUNICIONALIDAD MODO OSCURO-->    
-    <script>
-  const btnModo = document.getElementById('modoOscuroBtn');
-  const root = document.documentElement;
-
-  // Cargar desde localStorage
-  if (localStorage.getItem('modoOscuro') === 'activo') {
-    document.documentElement.classList.add('dark-mode');
-    btnModo.textContent = '☀️ Modo Claro';
-  }
-
-  btnModo.addEventListener('click', () => {
-    document.documentElement.classList.toggle('dark-mode');
-    const activo = document.documentElement.classList.contains('dark-mode');
-    btnModo.textContent = activo ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
-    localStorage.setItem('modoOscuro', activo ? 'activo' : 'inactivo');
-  });
-</script>
-
-
 </html>
-

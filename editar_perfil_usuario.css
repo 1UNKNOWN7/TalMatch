@@ -1,0 +1,356 @@
+/* ==========================================================
+   TalMatch – Editar Perfil (Usuario)
+   Hoja de estilos con:
+   - Variables CSS (colores, bordes, sombras, radios)
+   - Modo claro/oscuro con clase .dark en <body>
+   - Diseño limpio, centrado y responsivo
+   - Adaptado a la paleta corporativa de TalMatch
+   ========================================================== */
+
+/* ----------------------- */
+/* Variables del tema base */
+/* ----------------------- */
+:root{
+  --bg: #f4f6f9;                  /* Fondo general gris claro */
+  --card: #ffffff;                 /* Fondo de tarjetas y header */
+  --text: #0f172a;                 /* Color de texto principal */
+  --muted: #475569;                /* Texto secundario/pistas */
+  --primary: #00aaff;               /* Azul corporativo */
+  --primary-hover: #168be0;        /* Azul más oscuro para hover */
+  --primary-light: #e8f4ff;        /* Azul muy claro para fondos */
+  --primary-contrast: #ffffff;     /* Texto sobre botones primarios */
+  --border: #a9d7ff;               /* Bordes y divisores claros azulados */
+  --border-strong: #00aaff;         /* Bordes azules intermedios */
+  --shadow: 0 10px 20px rgba(20, 60, 120, .06); /* Sombra con tinte azul */
+  --radius: 14px;                  /* Radio de bordes consistente */
+}
+
+/* ------------------------------ */
+/* Overrides para el modo oscuro  */
+/* (se activa con body.dark)      */
+/* ------------------------------ */
+body.dark{
+  --bg: #0f172a;                  
+  --card: #111827;                
+  --text: #e5e7eb;                
+  --muted: #9ca3af;               
+  --primary: #48b0ff;             
+  --primary-hover: #39a1f2;       
+  --primary-light: #0b2540;       
+  --primary-contrast: #0b1020;    
+  --border: #1f2937;              
+  --border-strong: #1f2937;       
+  --shadow: 0 10px 24px rgba(0,0,0,.45); 
+}
+
+/* ------------------------------ */
+/* Reseteos y tipografía global   */
+/* ------------------------------ */
+*{ box-sizing: border-box }       
+html,body{ height:100% }          
+
+body{
+  margin:0;                       
+  background: var(--bg);          
+  color: var(--text);             
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  line-height: 1.5;               
+}
+
+/* ------------------------------ */
+/* Estructura general de la página */
+/* ------------------------------ */
+.page-wrap{
+  min-height:100%;                
+  display:flex;                   
+  flex-direction:column;
+}
+
+/* ------------------------------ */
+/* Header (barra superior fija)   */
+/* ------------------------------ */
+.tm-header{
+  display:flex;                   
+  align-items:center;             
+  justify-content:space-between;  
+  padding:16px 20px;              
+  border-bottom:3px solid var(--border-strong); /* línea azul corporativa */
+  background: var(--card);        
+  position: sticky;               
+  top:0;
+  z-index: 10;                    
+}
+
+/* Marca (logo + título) */
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;                       
+}
+
+/* Logo: tamaño fijo + sombra */
+.logo{
+  width:44px;
+  height:44px;
+  object-fit:contain;
+  border-radius:10px;
+  box-shadow: var(--shadow);
+  background:#fff;                
+}
+
+/* Título del header */
+.tm-header h1{
+  margin:0;
+  font-size: clamp(18px, 2.4vw, 24px);
+}
+
+/* Contenedor de acciones */
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+/* ------------------------------ */
+/* Contenedor del contenido       */
+/* ------------------------------ */
+.tm-container{
+  width:min(1100px, 92%);         
+  margin: 24px auto;              
+}
+
+/* ------------------------------ */
+/* Tarjetas de contenido          */
+/* ------------------------------ */
+.card{
+  background: var(--card);
+  border: 3px solid #00aaff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+/* Títulos de tarjeta */
+.card h2{
+  margin: 4px 0 16px;
+  font-size: clamp(18px, 2.3vw, 22px);
+}
+
+/* ------------------------------ */
+/* Formulario y grupos de campos  */
+/* ------------------------------ */
+.form-group{
+  display:flex;
+  flex-direction:column;
+  margin-bottom:14px;
+}
+
+/* Etiquetas */
+label{
+  font-weight:600;
+  margin-bottom:6px;
+}
+
+/* Inputs y textareas */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="url"],
+input[type="number"],
+input[type="file"],
+textarea{
+  width:100%;
+  padding:12px 14px;
+  border:2px solid var(--border-strong); /* borde azul corporativo */
+  border-radius:12px;
+  background: #fff;
+  color: var(--text);
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+textarea{ resize: vertical; }
+
+/* Estado focus */
+input:focus, textarea:focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
+  background: var(--primary-light);
+}
+
+/* Texto de ayuda */
+.hint{
+  color: var(--muted);
+  font-size: 12px;
+  margin-top:6px;
+}
+
+/* Grid de 2 columnas */
+.grid-2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:16px;
+}
+
+@media (max-width: 760px){
+  .grid-2{ grid-template-columns: 1fr; }
+}
+
+/* ------------------------------ */
+/* Acciones del formulario        */
+/* ------------------------------ */
+.form-actions{
+  display:flex;
+  gap:10px;
+  justify-content:flex-end;
+  margin-top:10px;
+}
+
+/* ------------------------------ */
+/* Botones base                   */
+/* ------------------------------ */
+.btn{
+  appearance: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid var(--border-strong);
+  background: #fff;
+  color: var(--text);
+  transition: transform .04s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+}
+
+.btn:active{
+  transform: translateY(1px);
+}
+
+.btn-primary{
+  background: var(--primary);
+  border-color: var(--primary-hover);
+  color: var(--primary-contrast);
+  box-shadow: 0 4px 10px rgba(30,161,255,.25);
+}
+.btn-primary:hover{
+  filter: brightness(1.05);
+}
+
+.btn-secondary{
+  background: #fff;
+  border-color: var(--primary-hover);
+  color: var(--primary-hover);
+}
+.btn-secondary:hover{
+  background: var(--primary-light);
+}
+
+.btn-ghost{
+  background: #fff;
+  border-color: var(--border-strong);
+  color: var(--muted);
+}
+.btn-ghost:hover{
+  color: var(--text);
+  background: var(--primary-light);
+}
+
+/* Enlaces */
+.link{
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+.link:hover{
+  text-decoration: underline;
+}
+
+.cv-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+/* ------------------------------ */
+/* Toggle de Tema                 */
+/* ------------------------------ */
+.theme-toggle{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  user-select:none;
+}
+.theme-toggle input{ display:none; }
+.theme-label{ font-size: 14px; color: var(--muted); }
+
+.slider{
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: #c7e5ff;
+  position: relative;
+  transition: background .2s ease;
+  border:2px solid var(--border-strong);
+}
+.slider::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  left:2px;
+  translate:0 -50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--shadow);
+  transition: left .2s ease;
+  border: 2px solid var(--border-strong);
+}
+input:checked + .slider{ background: var(--primary); border-color: var(--primary-hover); }
+input:checked + .slider::after{ left:22px; }
+
+/* ------------------------------ */
+/* Separador visual               */
+/* ------------------------------ */
+.divider{
+  height:1px;
+  background: var(--border);
+  margin: 18px 0;
+}
+
+/* ------------------------------ */
+/* Toast (notificaciones)         */
+/* ------------------------------ */
+.toast{
+  position: fixed;
+  right: 16px;
+  top: 78px;
+  background: var(--card);
+  color: var(--text);
+  border:2px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 10px 14px;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events:none;
+  transform: translateY(-8px);
+  transition: opacity .2s ease, transform .2s ease;
+  z-index: 20;
+}
+.toast.show{
+  opacity:1;
+  pointer-events:auto;
+  transform: translateY(0);
+}
+.toast.success{ border-color: #22c55e; }
+.toast.error{ border-color: #ef4444; }
+.toast.info{ border-color: #f59e0b; }
+
+/* ------------------------------ */
+/* Footer                         */
+/* ------------------------------ */
+.tm-footer{
+  margin-top:auto;
+  padding: 16px 20px;
+  color: var(--muted);
+  text-align: center;
+}

@@ -1,70 +1,380 @@
-<!-- solicitudes_empresa.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Solicitudes Enviadas</title>
-  <link rel="stylesheet" href="solicitudes_empresa.css">
-  <link rel="stylesheet" href="global.css">
+  <!-- ============ Metadatos ============ -->
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TalMatch – Solicitudes enviadas</title>
+
+  <!-- ============ Estilos ============ -->
+  <link rel="stylesheet" href="solicitudes_empresa.css"/>
+
+  <!-- Fuente consistente con el proyecto -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <h1>Solicitudes Enviadas a Usuarios</h1>
-    <button id="modoOscuroBtn">🌙 Modo Oscuro</button>
-  </header>
+  <!-- =========================================================
+       CONTENEDOR GENERAL
+  ========================================================== -->
+  <div class="page-wrap">
 
-  <main>
-    <table>
-      <thead>
-        <tr>
-          <th>Estudiante</th>
-          <th>Carrera</th>
-          <th>Fecha</th>
-          <th>Estado</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Juan Pérez</td>
-          <td>Ing. en Sistemas</td>
-          <td>2025-07-28</td>
-          <td>Aceptada</td>
-          <td><a href="mensajes.html" class="verchat">Ver Chat</a></td>
-        </tr>
-        <tr>
-          <td>Lucía Rodríguez</td>
-          <td>Ing. Industrial</td>
-          <td>2025-07-27</td>
-          <td>Pendiente</td>
-          <td><span class="pendiente">Esperando respuesta</span></td>
-        </tr>
-        <!-- Más solicitudes -->
-      </tbody>
-    </table>
-  </main>
+    <!-- ============ HEADER SUPERIOR ============ -->
+    <header class="tm-header">
+      <div class="brand">
+        <img src="imagenes/talmach.jpg" alt="TalMatch" class="logo">
+        <h1>Solicitudes enviadas</h1>
+      </div>
 
+      <div class="header-actions">
+        <a href="inicio_empresa.html" class="btn btn-secondary">← Volver</a>
 
-<!-- FUNICIONALIDAD MODO OSCURO-->    
-    <script>
-  const btnModo = document.getElementById('modoOscuroBtn');
-  const root = document.documentElement;
+        <!-- Toggle de modo oscuro -->
+        <label class="theme-toggle">
+          <!-- Checkbox oculto que alterna la clase .dark en <body> -->
+          <input id="themeSwitch" type="checkbox" aria-label="Activar modo oscuro">
+          <span class="slider"></span>
+          <span class="theme-label">Modo oscuro</span>
+        </label>
+      </div>
+    </header>
 
-  // Cargar desde localStorage
-  if (localStorage.getItem('modoOscuro') === 'activo') {
-    document.documentElement.classList.add('dark-mode');
-    btnModo.textContent = '☀️ Modo Claro';
-  }
+    <!-- ============ CONTENIDO PRINCIPAL ============ -->
+    <main class="tm-container">
+      <!-- Toast de feedback -->
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  btnModo.addEventListener('click', () => {
-    document.documentElement.classList.toggle('dark-mode');
-    const activo = document.documentElement.classList.contains('dark-mode');
-    btnModo.textContent = activo ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
-    localStorage.setItem('modoOscuro', activo ? 'activo' : 'inactivo');
-  });
-</script>
+      <!--
+        CARD PRINCIPAL
+        ⚠️ Requisito visual: borde azul TalMatch
+        border: 3px solid #00aaff;
+      -->
+      <section class="card">
+        <h2>Solicitudes de reclutamiento (empresa → candidatos)</h2>
 
+        <!-- Barra de herramientas: filtro + búsqueda + acciones demo -->
+        <div class="toolbar">
+          <!-- Filtro por Estado -->
+          <div class="control">
+            <label for="filtroEstado">Estado</label>
+            <select id="filtroEstado">
+              <option value="TODOS">Todos</option>
+              <option value="PENDIENTE">Pendiente</option>
+              <option value="ACEPTADA">Aceptada</option>
+              <option value="RECHAZADA">Rechazada</option>
+              <option value="CONTRATADO">Contratado</option>
+            </select>
+          </div>
 
+          <!-- Búsqueda por nombre/carrera -->
+          <div class="control grow">
+            <label for="busqueda">Buscar</label>
+            <input id="busqueda" type="search" placeholder="Nombre o carrera... (Ej. Cecilia, Sistemas)">
+          </div>
+
+          <!-- Acciones demo -->
+          <div class="actions">
+            <button id="btnCargarDemo" class="btn btn-ghost" type="button">Cargar demo</button>
+            <button id="btnResetear" class="btn btn-ghost" type="button">Reiniciar</button>
+          </div>
+        </div>
+
+        <!-- Resumen / contadores -->
+        <div class="summary">
+          <span id="resumenConteo">0 solicitudes</span>
+          <span class="dot">•</span>
+          <span id="resumenPendientes">0 pendientes</span>
+        </div>
+
+        <!-- Tabla accesible (responsive a tarjetas en móvil) -->
+        <div class="table-wrap" role="region" aria-labelledby="tablaTitulo">
+          <table class="table" aria-describedby="tablaDesc">
+            <caption id="tablaTitulo" class="sr-only">Listado de solicitudes enviadas a candidatos</caption>
+            <thead>
+              <tr>
+                <th scope="col">Candidato</th>
+                <th scope="col">Carrera</th>
+                <th scope="col">Mensaje</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Estado</th>
+                <th scope="col" class="col-acciones">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbodySolicitudes">
+              <!-- Filas generadas por JS -->
+            </tbody>
+          </table>
+          <p id="tablaDesc" class="sr-only">
+            Use los botones para cancelar, reenviar, marcar contratado o abrir el chat.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="tm-footer">
+      <small>© TalMatch · Gestión de solicitudes enviadas por la empresa.</small>
+    </footer>
+  </div>
+
+  <!-- =========================================================
+       JS SIN BACKEND (DEMO localStorage)
+       - Persistencia de solicitudes de la empresa
+       - Filtros + búsqueda
+       - Acciones por estado (cancelar, reenviar, mensajear, contratado)
+  ========================================================== -->
+  <script>
+    // ---------- Claves de almacenamiento ----------
+    const KEY_THEME = "talmatch_theme";
+    const KEY_SOL_EMP = "talmatch_solicitudes_empresa"; // array de objetos
+    const KEY_BADGE_MENSAJES = "talmatch_badge_mensajes"; // opcional: para navbar global
+
+    // ---------- Refs DOM ----------
+    const themeSwitch = document.getElementById("themeSwitch");
+    const toast = document.getElementById("toast");
+    const filtroEstado = document.getElementById("filtroEstado");
+    const busqueda = document.getElementById("busqueda");
+    const btnCargarDemo = document.getElementById("btnCargarDemo");
+    const btnResetear = document.getElementById("btnResetear");
+    const tbody = document.getElementById("tbodySolicitudes");
+    const resumenConteo = document.getElementById("resumenConteo");
+    const resumenPendientes = document.getElementById("resumenPendientes");
+
+    // ---------- Estado en memoria ----------
+    let solicitudes = [];
+
+    // ---------- Tema ----------
+    (function initTheme(){
+      const saved = localStorage.getItem(KEY_THEME) || "light";
+      if (saved === "dark") {
+        document.body.classList.add("dark");
+        themeSwitch.checked = true;
+      }
+      themeSwitch.addEventListener("change", () => {
+        document.body.classList.toggle("dark", themeSwitch.checked);
+        localStorage.setItem(KEY_THEME, themeSwitch.checked ? "dark" : "light");
+      });
+    })();
+
+    // ---------- Seeds demo ----------
+    function crearDemo(){
+      return [
+        {
+          id: "E-S-2001",
+          userId: "U-0001",
+          nombre: "Cecilia Méndez",
+          carrera: "Ing. en Sistemas",
+          mensaje: "Vimos tu perfil y queremos invitarte a entrevista.",
+          fecha: "2025-08-05",
+          estado: "PENDIENTE" // PENDIENTE | ACEPTADA | RECHAZADA | CONTRATADO
+        },
+        {
+          id: "E-S-2002",
+          userId: "U-0002",
+          nombre: "Edgar Guzmán",
+          carrera: "Ing. en Sistemas",
+          mensaje: "Nos interesa tu experiencia en soporte.",
+          fecha: "2025-08-03",
+          estado: "ACEPTADA"
+        },
+        {
+          id: "E-S-2003",
+          userId: "U-0003",
+          nombre: "Susan Lediar",
+          carrera: "Marketing",
+          mensaje: "Postulación para prácticas de marketing digital.",
+          fecha: "2025-07-29",
+          estado: "RECHAZADA"
+        }
+      ];
+    }
+
+    // ---------- Utilidades ----------
+    function showToast(msg, type="info"){
+      toast.textContent = msg;
+      toast.className = `toast ${type} show`;
+      setTimeout(() => toast.classList.remove("show"), 2000);
+    }
+    const fmt = iso => {
+      if(!iso) return "";
+      const [y,m,d] = iso.split("-");
+      return `${d}/${m}/${y}`;
+    };
+    function guardar(){
+      localStorage.setItem(KEY_SOL_EMP, JSON.stringify(solicitudes));
+      // opcional: si algún hilo se abre, podríamos incrementar badge de mensajes
+      const chats = solicitudes.filter(s => s.estado === "ACEPTADA").length;
+      localStorage.setItem(KEY_BADGE_MENSAJES, String(chats));
+    }
+    function cargar(){
+      try{
+        const raw = localStorage.getItem(KEY_SOL_EMP);
+        solicitudes = raw ? JSON.parse(raw) : [];
+      }catch{ solicitudes = []; }
+    }
+
+    // ---------- Render ----------
+    function render(){
+      const estado = filtroEstado.value;
+      const q = (busqueda.value || "").toLowerCase().trim();
+
+      const data = solicitudes.filter(s => {
+        const okEstado = (estado === "TODOS") || s.estado === estado;
+        const texto = (s.nombre + " " + s.carrera).toLowerCase();
+        const okBusqueda = q === "" || texto.includes(q);
+        return okEstado && okBusqueda;
+      });
+
+      tbody.innerHTML = "";
+
+      if (data.length === 0){
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 6;
+        td.className = "empty";
+        td.textContent = "No hay solicitudes con los filtros actuales.";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      } else {
+        for (const s of data){
+          const tr = document.createElement("tr");
+
+          // Candidato
+          const tdU = document.createElement("td");
+          tdU.dataset.label = "Candidato";
+          tdU.innerHTML = `
+            <div class="person">
+              <strong>${s.nombre}</strong>
+              <div class="muted">ID: ${s.userId}</div>
+            </div>
+          `;
+          tr.appendChild(tdU);
+
+          // Carrera
+          const tdC = document.createElement("td");
+          tdC.dataset.label = "Carrera";
+          tdC.textContent = s.carrera;
+          tr.appendChild(tdC);
+
+          // Mensaje
+          const tdM = document.createElement("td");
+          tdM.dataset.label = "Mensaje";
+          tdM.textContent = s.mensaje;
+          tr.appendChild(tdM);
+
+          // Fecha
+          const tdF = document.createElement("td");
+          tdF.dataset.label = "Fecha";
+          tdF.textContent = fmt(s.fecha);
+          tr.appendChild(tdF);
+
+          // Estado (pill)
+          const tdE = document.createElement("td");
+          tdE.dataset.label = "Estado";
+          tdE.innerHTML = `<span class="pill ${s.estado.toLowerCase()}">${s.estado}</span>`;
+          tr.appendChild(tdE);
+
+          // Acciones
+          const tdA = document.createElement("td");
+          tdA.dataset.label = "Acciones";
+          tdA.className = "acciones";
+
+          if (s.estado === "PENDIENTE") {
+            // Cancelar solicitud
+            const btnCancel = document.createElement("button");
+            btnCancel.type = "button";
+            btnCancel.className = "btn btn-secondary";
+            btnCancel.textContent = "Cancelar";
+            btnCancel.addEventListener("click", ()=>{
+              s.estado = "RECHAZADA";
+              guardar(); render();
+              showToast("Solicitud cancelada.", "info");
+            });
+            tdA.appendChild(btnCancel);
+          }
+
+          if (s.estado === "ACEPTADA") {
+            // Mensajear (abre chat)
+            const linkChat = document.createElement("a");
+            linkChat.href = "mensajes.html";
+            linkChat.className = "btn btn-primary";
+            linkChat.textContent = "Mensajear";
+            tdA.appendChild(linkChat);
+
+            // Marcar contratado
+            const btnHire = document.createElement("button");
+            btnHire.type = "button";
+            btnHire.className = "btn btn-secondary";
+            btnHire.textContent = "Marcar contratado";
+            btnHire.addEventListener("click", ()=>{
+              s.estado = "CONTRATADO";
+              guardar(); render();
+              showToast("Candidato marcado como contratado.", "success");
+            });
+            tdA.appendChild(btnHire);
+          }
+
+          if (s.estado === "RECHAZADA") {
+            // Reenviar (volver a pendiente)
+            const btnRe = document.createElement("button");
+            btnRe.type = "button";
+            btnRe.className = "btn btn-ghost";
+            btnRe.textContent = "Reenviar";
+            btnRe.addEventListener("click", ()=>{
+              s.estado = "PENDIENTE";
+              guardar(); render();
+              showToast("Solicitud reenviada (pendiente).", "info");
+            });
+            tdA.appendChild(btnRe);
+          }
+
+          if (s.estado === "CONTRATADO") {
+            const lab = document.createElement("span");
+            lab.className = "muted";
+            lab.textContent = "Proceso finalizado";
+            tdA.appendChild(lab);
+          }
+
+          // Ver perfil del candidato
+          const linkPerfil = document.createElement("a");
+          linkPerfil.href = "vpusuario.html"; // cuando tengas ?id=, enlázalo aquí
+          linkPerfil.className = "btn btn-secondary";
+          linkPerfil.textContent = "Ver perfil";
+          tdA.appendChild(linkPerfil);
+
+          tr.appendChild(tdA);
+          tbody.appendChild(tr);
+        }
+      }
+
+      // Resumen
+      resumenConteo.textContent = `${solicitudes.length} solicitudes`;
+      const pend = solicitudes.filter(x => x.estado === "PENDIENTE").length;
+      resumenPendientes.textContent = `${pend} pendientes`;
+    }
+
+    // ---------- Inicio ----------
+    (function init(){
+      cargar();
+      // Listeners
+      filtroEstado.addEventListener("change", render);
+      busqueda.addEventListener("input", render);
+      btnCargarDemo.addEventListener("click", ()=>{
+        solicitudes = crearDemo();
+        guardar(); render();
+        showToast("Datos de ejemplo cargados.", "success");
+      });
+      btnResetear.addEventListener("click", ()=>{
+        localStorage.removeItem(KEY_SOL_EMP);
+        solicitudes = [];
+        render();
+        showToast("Solicitudes eliminadas.", "success");
+      });
+
+      // Si no hay datos, dejamos vacío (o activa la línea de abajo para precargar)
+      // solicitudes = crearDemo(); guardar();
+      render();
+    })();
+  </script>
 </body>
 </html>

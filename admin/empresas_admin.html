@@ -1,89 +1,204 @@
-<!-- empresas_admin.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Empresas - Admin</title>
-  <link rel="stylesheet" href="inicio_admin.css">
-  <link rel="stylesheet" href="modo_oscuro.css">
-  <style>
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 30px;
-    }
+  <!-- ===== Meta ===== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>TalMatch – Gestión de Empresas</title>
 
-    th, td {
-      border: 1px solid #ccc;
-      padding: 12px;
-      text-align: center;
-    }
+  <!-- ===== Estilos ===== -->
+  <link rel="stylesheet" href="empresas_admin.css"/>
 
-    th {
-      background-color: #f0f0f0;
-    }
-
-    .acciones a {
-      margin: 0 5px;
-      color: #1a73e8;
-      text-decoration: none;
-    }
-  </style>
+  <!-- Fuente coherente -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <h1>Gestión de Empresas</h1>
-    <nav>
-      <ul>
-        <li><a href="inicio_admin.html">Volver al Panel</a></li>
-      </ul>
-    </nav>
-  </header>
+  <div class="page-wrap">
+    <!-- ===== Header ===== -->
+    <header class="tm-header">
+      <div class="brand">
+        <img src="/imagenes/talmach.jpg" alt="TalMatch" class="logo">
+        <h1>Gestión de empresas</h1>
+      </div>
+      <div class="header-actions">
+        <a href="inicio_admin.html" class="btn btn-secondary">← Volver</a>
+        <!-- Toggle dark mode -->
+        <label class="theme-toggle">
+          <input id="themeSwitch" type="checkbox" aria-label="Activar modo oscuro">
+          <span class="slider"></span>
+          <span class="theme-label">Modo oscuro</span>
+        </label>
+      </div>
+    </header>
 
-  <main>
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre Empresa</th>
-          <th>Sector</th>
-          <th>Contacto</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>InnovaTech</td>
-          <td>Tecnología</td>
-          <td>innova@correo.com</td>
-          <td class="acciones">
-            <a href="#">Ver perfil</a> |
-            <a href="#">Eliminar</a>
-          </td>
-        </tr>
-        <!-- Más empresas -->
-      </tbody>
-    </table>
-  </main>
+    <main class="tm-container">
+      <!-- Toast -->
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+      <!-- ===== Card principal ===== -->
+      <section class="card">
+        <h2>Empresas registradas</h2>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div class="control">
+            <label for="filtroVerif">Verificación</label>
+            <select id="filtroVerif">
+              <option value="TODAS">Todas</option>
+              <option value="PENDIENTE">Pendiente</option>
+              <option value="VERIFICADA">Verificada</option>
+              <option value="SUSPENDIDA">Suspendida</option>
+            </select>
+          </div>
+
+          <div class="control grow">
+            <label for="busqueda">Buscar</label>
+            <input id="busqueda" type="search" placeholder="Nombre, rubro o ID...">
+          </div>
+
+          <div class="actions">
+            <button id="btnDemo" class="btn btn-ghost" type="button">Cargar demo</button>
+            <button id="btnReset" class="btn btn-ghost" type="button">Reiniciar</button>
+          </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Empresa</th>
+                <th>Rubro</th>
+                <th>Correo</th>
+                <th>Estado</th>
+                <th class="col-acciones">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyEmpresas">
+              <!-- filas via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="tm-footer"><small>© TalMatch · Admin</small></footer>
+  </div>
+
+  <!-- ===== JS DEMO (sin backend) ===== -->
+  <script>
+    // ---- Storage keys
+    const KEY_THEME = "talmatch_theme";
+    const KEY_ADMIN_COMP = "talmatch_admin_companies";
+
+    // ---- Refs
+    const themeSwitch = document.getElementById('themeSwitch');
+    const toast = document.getElementById('toast');
+    const filtroVerif = document.getElementById('filtroVerif');
+    const busqueda = document.getElementById('busqueda');
+    const btnDemo = document.getElementById('btnDemo');
+    const btnReset = document.getElementById('btnReset');
+    const tbody = document.getElementById('tbodyEmpresas');
+
+    // ---- Tema
+    (function initTheme(){
+      const saved = localStorage.getItem(KEY_THEME) || "light";
+      if (saved === "dark") { document.body.classList.add("dark"); themeSwitch.checked = true; }
+      themeSwitch.addEventListener("change", ()=>{
+        document.body.classList.toggle("dark", themeSwitch.checked);
+        localStorage.setItem(KEY_THEME, themeSwitch.checked ? "dark" : "light");
+      });
+    })();
+
+    // ---- Utils
+    function toastMsg(msg,type="info"){ toast.textContent = msg; toast.className = `toast ${type} show`; setTimeout(()=>toast.classList.remove('show'),1800); }
+    function save(data){ localStorage.setItem(KEY_ADMIN_COMP, JSON.stringify(data)); }
+    function load(){ try{ return JSON.parse(localStorage.getItem(KEY_ADMIN_COMP) || "[]"); }catch{ return []; } }
+
+    // ---- Seeds
+    function demo(){
+      return [
+        { id:"E-1001", nombre:"TecnoMasaya S.A.", rubro:"Software", correo:"contacto@tecnomasaya.com", estado:"VERIFICADA" },
+        { id:"E-1002", nombre:"AgroNica", rubro:"Agroindustria", correo:"rrhh@agronica.com", estado:"PENDIENTE" },
+        { id:"E-1003", nombre:"BlueCloud", rubro:"Cloud & Infra", correo:"talento@bluecloud.io", estado:"SUSPENDIDA" }
+      ];
+    }
+
+    let empresas = load();
+
+    // ---- Render
+    function render(){
+      const f = filtroVerif.value;
+      const q = (busqueda.value||"").toLowerCase().trim();
+
+      const data = empresas.filter(e=>{
+        const okF = f==="TODAS" || e.estado===f;
+        const txt = (e.nombre+" "+e.rubro+" "+e.id).toLowerCase();
+        const okQ = q==="" || txt.includes(q);
+        return okF && okQ;
+      });
+
+      tbody.innerHTML = "";
+      if(!data.length){
+        tbody.innerHTML = `<tr><td class="empty" colspan="5">Sin resultados</td></tr>`;
+        return;
+      }
+      for(const e of data){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td data-label="Empresa"><strong>${e.nombre}</strong><div class="muted">ID: ${e.id}</div></td>
+          <td data-label="Rubro">${e.rubro}</td>
+          <td data-label="Correo">${e.correo}</td>
+          <td data-label="Estado"><span class="pill ${e.estado.toLowerCase()}">${e.estado}</span></td>
+          <td data-label="Acciones" class="acciones">
+            <button class="btn btn-secondary" data-id="${e.id}" data-act="editar">Editar</button>
+            ${e.estado!=="VERIFICADA" ? `<button class="btn btn-primary" data-id="${e.id}" data-act="verificar">Verificar</button>` : `<button class="btn btn-ghost" data-id="${e.id}" data-act="revocar">Revocar</button>`}
+            <button class="btn ${e.estado==='SUSPENDIDA'?'btn-primary':'btn-ghost'}" data-id="${e.id}" data-act="toggle">${e.estado==='SUSPENDIDA'?'Reactivar':'Suspender'}</button>
+            <button class="btn btn-ghost" data-id="${e.id}" data-act="eliminar">Eliminar</button>
+            <a class="btn btn-secondary" href="vempresa.html">Ver perfil</a>
+          </td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    // ---- Acciones
+    document.addEventListener("click",(ev)=>{
+      const btn = ev.target.closest("button");
+      if(!btn) return;
+      const id = btn.dataset.id;
+      const act = btn.dataset.act;
+      const e = empresas.find(x=>x.id===id);
+      if(!e) return;
+
+      if(act==="editar"){
+        const nuevoNombre = prompt("Editar nombre de empresa:", e.nombre);
+        if(nuevoNombre && nuevoNombre.trim()){ e.nombre = nuevoNombre.trim(); save(empresas); render(); toastMsg("Empresa actualizada","success"); }
+      }
+      if(act==="verificar"){ e.estado = "VERIFICADA"; save(empresas); render(); toastMsg("Empresa verificada","success"); }
+      if(act==="revocar"){ e.estado = "PENDIENTE"; save(empresas); render(); toastMsg("Verificación revocada","info"); }
+      if(act==="toggle"){
+        e.estado = (e.estado==="SUSPENDIDA") ? "PENDIENTE" : "SUSPENDIDA";
+        save(empresas); render(); toastMsg(e.estado==="SUSPENDIDA"?"Empresa suspendida":"Empresa reactivada","info");
+      }
+      if(act==="eliminar"){
+        if(confirm("¿Eliminar empresa? Esta acción es irreversible.")){
+          empresas = empresas.filter(x=>x.id!==id);
+          save(empresas); render(); toastMsg("Empresa eliminada","error");
+        }
+      }
+    });
+
+    // Controles
+    filtroVerif.addEventListener("change", render);
+    busqueda.addEventListener("input", render);
+
+    // Demo
+    btnDemo.addEventListener("click", ()=>{ empresas = demo(); save(empresas); render(); toastMsg("Datos de demo cargados","success"); });
+    btnReset.addEventListener("click", ()=>{ localStorage.removeItem(KEY_ADMIN_COMP); empresas=[]; render(); toastMsg("Demo reiniciada","success"); });
+
+    // Init
+    render();
+  </script>
 </body>
-
-
-<!-- FUNICIONALIDAD MODO OSCURO-->    
-    <script>
-  const btnModo = document.getElementById('modoOscuroBtn');
-  const root = document.documentElement;
-
-  // Cargar desde localStorage
-  if (localStorage.getItem('modoOscuro') === 'activo') {
-    document.documentElement.classList.add('dark-mode');
-    btnModo.textContent = '☀️ Modo Claro';
-  }
-
-  btnModo.addEventListener('click', () => {
-    document.documentElement.classList.toggle('dark-mode');
-    const activo = document.documentElement.classList.contains('dark-mode');
-    btnModo.textContent = activo ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
-    localStorage.setItem('modoOscuro', activo ? 'activo' : 'inactivo');
-  });
-</script>
-
 </html>

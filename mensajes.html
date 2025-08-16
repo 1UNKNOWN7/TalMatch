@@ -1,51 +1,353 @@
-<!-- mensajes.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat con Usuario</title>
-  <link rel="stylesheet" href="mensajes.css">
+  <!-- ================== Metadatos básicos ================== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TalMatch – Mensajes</title>
+
+  <!-- ================== Hoja de estilos ================== -->
+  <link rel="stylesheet" href="mensajes.css"/>
+
+  <!-- ================== Fuente (coherente con el proyecto) ================== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <h1>Chat Privado</h1>
-    <p>Solo disponible si el estudiante aceptó tu solicitud de reclutamiento</p>
-  </header>
+  <!-- =========================================================
+       CONTENEDOR GENERAL (layout completo)
+  ========================================================== -->
+  <div class="page-wrap">
 
-  <main class="chat-container">
-    <div class="chat-box" id="chatBox">
-      <div class="mensaje empresa">
-        <p>Hola Juan, gracias por aceptar nuestra solicitud.</p>
-        <span>Empresa · 08:30</span>
+    <!-- ================== HEADER / BARRA SUPERIOR ================== -->
+    <header class="tm-header">
+      <!-- Marca + título -->
+      <div class="brand">
+        <img src="imagenes/talmach.jpg" alt="TalMatch" class="logo">
+        <h1>Mensajes</h1>
       </div>
-      <div class="mensaje usuario">
-        <p>Con gusto. Estoy disponible para entrevista esta semana.</p>
-        <span>Juan Pérez · 08:35</span>
+
+      <!-- Acciones (volver + modo oscuro) -->
+      <div class="header-actions">
+        <a href="inicio_usuario.html" class="btn btn-secondary">← Volver</a>
+
+        <!-- Toggle Modo Oscuro -->
+        <label class="theme-toggle">
+          <!-- Checkbox “oculto” que alterna la clase .dark en <body> -->
+          <input id="themeSwitch" type="checkbox" aria-label="Activar modo oscuro">
+          <span class="slider"></span>
+          <span class="theme-label">Modo oscuro</span>
+        </label>
       </div>
-    </div>
+    </header>
 
-    <form class="formulario-chat" onsubmit="return enviarMensaje()">
-      <input type="text" id="mensajeInput" placeholder="Escribe un mensaje..." required>
-      <button type="submit">Enviar</button>
-    </form>
-  </main>
+    <!-- ================== CONTENIDO PRINCIPAL ================== -->
+    <main class="tm-container">
+      <!-- Toast de feedback -->
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+      <!--
+        CARD CONTENEDOR PRINCIPAL
+        ⚠️ Requisito: usar el borde azul de TalMatch (3px #00aaff)
+      -->
+      <section class="card chat-card">
+        <!-- Barra de herramientas -->
+        <div class="toolbar">
+          <div class="left">
+            <h2>Conversaciones</h2>
+          </div>
+          <div class="right">
+            <button id="btnCargarDemo" class="btn btn-ghost" title="Cargar datos de ejemplo">Cargar demo</button>
+            <button id="btnReset" class="btn btn-ghost" title="Borrar conversaciones de la demo">Reiniciar</button>
+          </div>
+        </div>
+
+        <!-- LAYOUT DE 2 COLUMNAS: lista (izq) + chat (der) -->
+        <div class="chat-layout">
+          <!-- ======= COLUMNA IZQUIERDA: LISTA DE HILOS ======= -->
+          <aside class="threads" aria-label="Lista de conversaciones">
+            <!-- Buscador de hilos -->
+            <div class="search">
+              <input id="searchThread" type="search" placeholder="Buscar empresa...">
+            </div>
+
+            <!-- Contador/resumen -->
+            <div class="summary">
+              <span id="threadsCount">0 conversaciones</span>
+            </div>
+
+            <!-- Lista de conversaciones (se llena por JS) -->
+            <ul id="threadsList" class="threads-list" role="listbox" aria-label="Conversaciones">
+              <!-- <li> generados dinámicamente -->
+            </ul>
+          </aside>
+
+          <!-- ======= COLUMNA DERECHA: CHAT ACTIVO ======= -->
+          <section class="chat" aria-label="Chat activo">
+            <!-- Encabezado del chat (nombre de la empresa / estado / acciones) -->
+            <header class="chat-header">
+              <div class="chat-meta">
+                <h3 id="chatTitle" class="truncate">Selecciona una conversación</h3>
+                <small id="chatStatus" class="muted">—</small>
+              </div>
+
+              <!-- Acción principal: VER PERFIL como BOTÓN TalMatch -->
+              <div class="chat-actions">
+                <!-- Antes era <a class="link">; ahora es botón secundario TalMatch -->
+                <a id="btnVerPerfil" href="#" class="btn btn-secondary" hidden>Ver perfil</a>
+              </div>
+            </header>
+
+            <!-- Área de mensajes -->
+            <div id="messages" class="messages" aria-live="polite">
+              <!-- Burbujas generadas dinámicamente -->
+            </div>
+
+            <!-- “Escribiendo…” -->
+            <div id="typing" class="typing" hidden>
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="typing-text">La empresa está escribiendo…</span>
+            </div>
+
+            <!-- Caja de texto + enviar -->
+            <form id="formSend" class="send-box" autocomplete="off">
+              <input id="msgInput" type="text" placeholder="Escribe un mensaje..." aria-label="Mensaje"/>
+              <button id="btnSend" type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <!-- ================== FOOTER ================== -->
+    <footer class="tm-footer">
+      <small>© TalMatch · Mensajería habilitada solo cuando hay match aceptado.</small>
+    </footer>
+  </div>
+
+  <!-- =========================================================
+       JS SIN BACKEND (DEMO CON localStorage)
+       - Persistencia de hilos y mensajes
+       - Estado "escribiendo…"
+       - Seeds de ejemplo
+  ========================================================== -->
   <script>
-    function enviarMensaje() {
-      const input = document.getElementById('mensajeInput');
-      const mensaje = input.value;
-      if (mensaje.trim() === '') return false;
+    // ---------- Claves de storage ----------
+    const KEY_THEME = "talmatch_theme";
+    const KEY_THREADS = "talmatch_mensajes_threads"; // Lista de hilos [{id, empresaId, empresaNombre, ultimo, ts, mensajes:[]}]
+    const KEY_ACTIVE = "talmatch_mensajes_activo";   // id del hilo activo
 
-      const chatBox = document.getElementById('chatBox');
-      const nuevo = document.createElement('div');
-      nuevo.classList.add('mensaje', 'empresa');
-      nuevo.innerHTML = `<p>${mensaje}</p><span>Empresa · ahora</span>`;
-      chatBox.appendChild(nuevo);
-      input.value = '';
-      chatBox.scrollTop = chatBox.scrollHeight;
-      return false; // evita recargar
+    // ---------- Refs DOM ----------
+    const themeSwitch = document.getElementById("themeSwitch");
+    const toast = document.getElementById("toast");
+    const btnCargarDemo = document.getElementById("btnCargarDemo");
+    const btnReset = document.getElementById("btnReset");
+    const searchThread = document.getElementById("searchThread");
+    const threadsList = document.getElementById("threadsList");
+    const threadsCount = document.getElementById("threadsCount");
+
+    const chatTitle = document.getElementById("chatTitle");
+    const chatStatus = document.getElementById("chatStatus");
+    const btnVerPerfil = document.getElementById("btnVerPerfil");
+    const messagesEl = document.getElementById("messages");
+    const typingEl = document.getElementById("typing");
+    const formSend = document.getElementById("formSend");
+    const msgInput = document.getElementById("msgInput");
+
+    // ---------- Estado ----------
+    let threads = [];            // hilos en memoria
+    let activeId = null;         // hilo activo
+
+    // ---------- Tema ----------
+    (function initTheme(){
+      const saved = localStorage.getItem(KEY_THEME) || "light";
+      if (saved === "dark") {
+        document.body.classList.add("dark");
+        themeSwitch.checked = true;
+      }
+      themeSwitch.addEventListener("change", () => {
+        document.body.classList.toggle("dark", themeSwitch.checked);
+        localStorage.setItem(KEY_THEME, themeSwitch.checked ? "dark" : "light");
+      });
+    })();
+
+    // ---------- Utilidades ----------
+    const nowIso = () => new Date().toISOString();
+    const fmtTime = iso => {
+      const d = new Date(iso);
+      return d.toLocaleString();
+    };
+    const showToast = (msg, type="info") => {
+      toast.textContent = msg;
+      toast.className = `toast ${type} show`;
+      setTimeout(() => toast.classList.remove("show"), 2000);
+    };
+
+    function persist() {
+      localStorage.setItem(KEY_THREADS, JSON.stringify(threads));
+      if (activeId) localStorage.setItem(KEY_ACTIVE, activeId);
     }
+    function load() {
+      try {
+        threads = JSON.parse(localStorage.getItem(KEY_THREADS) || "[]");
+      } catch { threads = []; }
+      activeId = localStorage.getItem(KEY_ACTIVE) || null;
+    }
+
+    // ---------- Seeds demo ----------
+    function demoThreads(){
+      return [
+        {
+          id: "T-1001",
+          empresaId: "E-03",
+          empresaNombre: "FinanSoft Group",
+          ultimo: "¿Te interesaría pasantía 3 meses?",
+          ts: nowIso(),
+          mensajes: [
+            { from:"empresa", text:"Hola, vimos tu perfil 👋", ts: nowIso() },
+            { from:"yo", text:"¡Hola! Gracias por contactar.", ts: nowIso() },
+            { from:"empresa", text:"¿Te interesaría pasantía 3 meses?", ts: nowIso() }
+          ]
+        },
+        {
+          id: "T-1002",
+          empresaId: "E-01",
+          empresaNombre: "TecnoMasaya S.A.",
+          ultimo: "Enviamos detalles de la vacante.",
+          ts: nowIso(),
+          mensajes: [
+            { from:"empresa", text:"Buenas, coincidimos con tus habilidades.", ts: nowIso() },
+            { from:"empresa", text:"Enviamos detalles de la vacante.", ts: nowIso() }
+          ]
+        }
+      ];
+    }
+
+    // ---------- Render de lista de hilos ----------
+    function renderThreads(){
+      const q = (searchThread.value || "").toLowerCase().trim();
+      const data = threads
+        .slice()
+        .sort((a,b)=> new Date(b.ts)-new Date(a.ts))
+        .filter(t => t.empresaNombre.toLowerCase().includes(q));
+
+      threadsList.innerHTML = "";
+      if (data.length === 0) {
+        const li = document.createElement("li");
+        li.className = "empty";
+        li.textContent = "No hay conversaciones.";
+        threadsList.appendChild(li);
+      } else {
+        for (const t of data){
+          const li = document.createElement("li");
+          li.className = "thread" + (t.id === activeId ? " active" : "");
+          li.tabIndex = 0;
+          li.role = "option";
+          li.setAttribute("aria-selected", t.id === activeId ? "true" : "false");
+
+          li.innerHTML = `
+            <div class="thread-title">${t.empresaNombre}</div>
+            <div class="thread-last">${t.ultimo || ""}</div>
+            <div class="thread-time">${fmtTime(t.ts)}</div>
+          `;
+          li.addEventListener("click", () => { activeId = t.id; persist(); renderAll(); });
+          threadsList.appendChild(li);
+        }
+      }
+      threadsCount.textContent = `${threads.length} conversaciones`;
+    }
+
+    // ---------- Render de chat activo ----------
+    function renderChat(){
+      const t = threads.find(x => x.id === activeId);
+      if (!t){
+        chatTitle.textContent = "Selecciona una conversación";
+        chatStatus.textContent = "—";
+        btnVerPerfil.hidden = true;
+        messagesEl.innerHTML = "";
+        return;
+      }
+
+      chatTitle.textContent = t.empresaNombre;
+      chatStatus.textContent = "Match aceptado · Chat habilitado";
+      btnVerPerfil.hidden = false;
+      btnVerPerfil.href = "#"; // cuando exista perfil_empresa.html, enlazar aquí
+
+      messagesEl.innerHTML = "";
+      for (const m of t.mensajes){
+        const bubble = document.createElement("div");
+        bubble.className = `msg ${m.from === "yo" ? "mine" : "theirs"}`;
+        bubble.innerHTML = `
+          <div class="msg-text">${m.text}</div>
+          <div class="msg-time">${fmtTime(m.ts)}</div>
+        `;
+        messagesEl.appendChild(bubble);
+      }
+      // scroll hacia el final
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function renderAll(){
+      renderThreads();
+      renderChat();
+    }
+
+    // ---------- Envío de mensajes ----------
+    formSend.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const txt = msgInput.value.trim();
+      if (!txt) return;
+
+      const t = threads.find(x => x.id === activeId);
+      if (!t){ showToast("Selecciona una conversación primero.", "info"); return; }
+
+      // Agrega mensaje mío
+      t.mensajes.push({ from:"yo", text:txt, ts: nowIso() });
+      t.ultimo = txt;
+      t.ts = nowIso();
+      msgInput.value = "";
+      persist();
+      renderAll();
+
+      // Simular respuesta de la empresa con “escribiendo…”
+      typingEl.hidden = false;
+      setTimeout(() => {
+        typingEl.hidden = true;
+        const reply = "Gracias por tu mensaje. Te contamos más en breve.";
+        t.mensajes.push({ from:"empresa", text: reply, ts: nowIso() });
+        t.ultimo = reply;
+        t.ts = nowIso();
+        persist();
+        renderAll();
+      }, 900);
+    });
+
+    // ---------- Botones demo ----------
+    btnCargarDemo.addEventListener("click", () => {
+      threads = demoThreads();
+      activeId = threads[0]?.id || null;
+      persist();
+      renderAll();
+      showToast("Conversaciones de demostración cargadas.", "success");
+    });
+
+    btnReset.addEventListener("click", () => {
+      localStorage.removeItem(KEY_THREADS);
+      localStorage.removeItem(KEY_ACTIVE);
+      threads = [];
+      activeId = null;
+      renderAll();
+      showToast("Demo de mensajes reiniciada.", "success");
+    });
+
+    // ---------- Búsqueda ----------
+    searchThread.addEventListener("input", renderThreads);
+
+    // ---------- Inicio ----------
+    (function init(){
+      load();
+      renderAll();
+    })();
   </script>
 </body>
 </html>

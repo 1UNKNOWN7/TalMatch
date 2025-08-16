@@ -1,43 +1,253 @@
-<!-- vpusuario.html actualizado -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ver Perfil Usuario</title>
-  <link rel="stylesheet" href="vpusuario.css">
+  <!-- ========= Metadatos ========= -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TalMatch – Ver Perfil de Usuario</title>
+
+  <!-- ========= Estilos ========= -->
+  <link rel="stylesheet" href="vpusuario.css"/>
+
+  <!-- Fuente consistente con el proyecto -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <h1>Perfil del Usuario</h1>
-  </header>
+  <!-- =========================================================
+       CONTENEDOR GENERAL (estructura de página completa)
+  ========================================================== -->
+  <div class="page-wrap">
 
-  <main>
-    <section class="perfil">
-      <img src="imagenes/usuario.jpg" alt="Foto de perfil">
-      <div class="info">
-        <h2>Juan Pérez</h2>
-        <p><strong>Carrera:</strong> Ingeniería en Sistemas</p>
-        <p><strong>Universidad:</strong> UNAN-Managua</p>
-        <p><strong>Descripción:</strong> Estudiante proactivo con interés en desarrollo web y bases de datos.</p>
-        <p><strong>CV:</strong> <a href="#">Descargar PDF</a></p>
+    <!-- ========= HEADER SUPERIOR ========= -->
+    <header class="tm-header">
+      <!-- Marca + título -->
+      <div class="brand">
+        <img src="imagenes/talmach.jpg" alt="TalMatch" class="logo">
+        <h1>Perfil del candidato</h1>
       </div>
-    </section>
 
-    <!-- Botón visible solo para empresas -->
-    <section class="acciones">
-      <button id="btnSolicitar" onclick="enviarSolicitud()">Solicitar Reclutamiento</button>
-      <p id="estadoSolicitud"></p>
-    </section>
-  </main>
+      <!-- Acciones (volver + modo oscuro) -->
+      <div class="header-actions">
+        <a href="inicio_empresa.html" class="btn btn-secondary">← Volver</a>
 
+        <!-- Toggle de modo oscuro -->
+        <label class="theme-toggle">
+          <!-- Checkbox oculto que alterna la clase .dark en <body> -->
+          <input id="themeSwitch" type="checkbox" aria-label="Activar modo oscuro">
+          <span class="slider"></span>
+          <span class="theme-label">Modo oscuro</span>
+        </label>
+      </div>
+    </header>
+
+    <!-- ========= CONTENIDO PRINCIPAL ========= -->
+    <main class="tm-container">
+      <!-- Toast de feedback (información, éxito, error) -->
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+      <!--
+        CARD PRINCIPAL
+        ⚠️ Requisito visual: borde azul TalMatch
+        border: 3px solid #00aaff;
+      -->
+      <section class="card profile-card">
+        <!-- ======= Encabezado del perfil (avatar + nombre + resumen) ======= -->
+        <header class="profile-head">
+          <div class="avatar-wrap">
+            <!-- Avatar del candidato (usa tu ruta real de imagen si la tienes) -->
+            <img id="avatar" src="imagenes/usuario.jpg" alt="Foto del candidato" class="avatar">
+          </div>
+          <div class="id-block">
+            <h2 id="nombre">Cecilia Méndez</h2>
+            <div class="meta">
+              <span id="rol">Estudiante de Ingeniería en Sistemas</span>
+              <span class="dot">•</span>
+              <span id="ubicacion">Masaya, Nicaragua</span>
+            </div>
+            <div class="tags">
+              <!-- Etiquetas rápidas (años, modalidad, disponibilidad) -->
+              <span class="tag">0–1 años</span>
+              <span class="tag">Modalidad: Híbrido</span>
+              <span class="tag">Disponibilidad: Parcial</span>
+            </div>
+          </div>
+
+          <!-- Acciones principales (lado derecho en desktop) -->
+          <div class="head-actions">
+            <!-- Enviar solicitud (simulado con localStorage) -->
+            <button id="btnSolicitar" class="btn btn-primary">Enviar Solicitud</button>
+            <!-- Mensajear (habilitado solo si ya hay match/solicitud aceptada) -->
+            <a id="btnMensajear" class="btn btn-secondary" href="mensajes.html" aria-disabled="true">Mensajear</a>
+            <!-- Guardar/Marcar como favorito -->
+            <button id="btnGuardar" class="btn btn-ghost" title="Guardar candidato">Guardar</button>
+          </div>
+        </header>
+
+        <!-- ======= Cuerpo del perfil ======= -->
+        <div class="profile-body">
+          <!-- Columna izquierda: info general -->
+          <section class="col about">
+            <h3>Acerca de</h3>
+            <p id="resumen">
+              Estudiante con interés en soporte técnico y redes. Manejo básico de Linux,
+              cableado estructurado y atención al usuario. Busco primera experiencia profesional.
+            </p>
+
+            <div class="grid-2">
+              <div class="field">
+                <label>Correo</label>
+                <div id="correo" class="value">cecilia.mendez@mail.com</div>
+              </div>
+              <div class="field">
+                <label>Teléfono</label>
+                <div id="telefono" class="value">+505 8888 0000</div>
+              </div>
+              <div class="field">
+                <label>LinkedIn</label>
+                <div class="value">
+                  <a id="linkedin" class="link" href="#" target="_blank" rel="noopener">/cecilia-mendez</a>
+                </div>
+              </div>
+              <div class="field">
+                <label>Ciudad</label>
+                <div id="ciudad" class="value">Masaya</div>
+              </div>
+            </div>
+
+            <!-- Botón ver CV (si existe) -->
+            <div class="cv-block">
+              <a id="btnVerCV" class="btn btn-secondary" href="#" aria-disabled="true">Ver CV</a>
+              <small class="muted">El CV se muestra cuando el candidato lo adjunta.</small>
+            </div>
+          </section>
+
+          <!-- Columna derecha: habilidades y experiencia -->
+          <section class="col skills">
+            <h3>Habilidades</h3>
+            <ul id="skills" class="chips">
+              <li>Soporte técnico</li>
+              <li>Redes</li>
+              <li>Excel</li>
+              <li>Atención al cliente</li>
+            </ul>
+
+            <h3>Experiencia / Educación</h3>
+            <ul class="timeline">
+              <li>
+                <span class="t-title">Universidad Nacional (2022–actualidad)</span>
+                <span class="t-sub">Ing. en Sistemas</span>
+              </li>
+              <li>
+                <span class="t-title">Servicio Social – Soporte TI (2024)</span>
+                <span class="t-sub">Mesa de ayuda y cableado</span>
+              </li>
+            </ul>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <!-- ========= FOOTER ========= -->
+    <footer class="tm-footer">
+      <small>© TalMatch · Vista de perfil para empresas.</small>
+    </footer>
+  </div>
+
+  <!-- =========================================================
+       JS DEMO (sin backend)
+       - Modo oscuro persistente
+       - Estado de solicitud / favorito (localStorage)
+  ========================================================== -->
   <script>
-    // Simulación del envío de solicitud de reclutamiento
-    function enviarSolicitud() {
-      document.getElementById('btnSolicitar').disabled = true;
-      document.getElementById('btnSolicitar').textContent = 'Solicitud Enviada';
-      document.getElementById('estadoSolicitud').textContent = 'La solicitud ha sido enviada y está pendiente de aceptación.';
+    // ====== Claves de localStorage ======
+    const KEY_THEME = "talmatch_theme";
+    const KEY_GUARDADOS = "talmatch_guardados";       // array de IDs guardados por la empresa
+    const KEY_SOLICITADAS = "talmatch_solicitudes_enviadas"; // array de IDs con solicitud enviada
+
+    // ====== Simulación de ID del usuario visto (en real vendría via query ?id=) ======
+    const USER_ID = "U-0001";
+
+    // ====== Refs DOM ======
+    const themeSwitch = document.getElementById("themeSwitch");
+    const toast = document.getElementById("toast");
+    const btnSolicitar = document.getElementById("btnSolicitar");
+    const btnMensajear = document.getElementById("btnMensajear");
+    const btnGuardar = document.getElementById("btnGuardar");
+    const btnVerCV = document.getElementById("btnVerCV");
+
+    // ====== Helpers ======
+    function showToast(msg, type="info"){
+      toast.textContent = msg;
+      toast.className = `toast ${type} show`;
+      setTimeout(()=> toast.classList.remove("show"), 2000);
     }
+    function getArray(key){
+      try{ return JSON.parse(localStorage.getItem(key) || "[]"); }catch{ return []; }
+    }
+    function setArray(key, arr){
+      localStorage.setItem(key, JSON.stringify(arr));
+    }
+
+    // ====== Modo oscuro ======
+    (function initTheme(){
+      const saved = localStorage.getItem(KEY_THEME) || "light";
+      if (saved === "dark") {
+        document.body.classList.add("dark");
+        themeSwitch.checked = true;
+      }
+      themeSwitch.addEventListener("change", () => {
+        document.body.classList.toggle("dark", themeSwitch.checked);
+        localStorage.setItem(KEY_THEME, themeSwitch.checked ? "dark" : "light");
+      });
+    })();
+
+    // ====== Estado inicial de botones (según storage) ======
+    function syncButtons(){
+      const guardados = getArray(KEY_GUARDADOS);
+      const solicitadas = getArray(KEY_SOLICITADAS);
+
+      // Guardado
+      const isSaved = guardados.includes(USER_ID);
+      btnGuardar.textContent = isSaved ? "Guardado ★" : "Guardar";
+      btnGuardar.setAttribute("aria-pressed", isSaved ? "true" : "false");
+
+      /*
+      // Solicitud enviada
+      const isRequested = solicitadas.includes(USER_ID);
+      btnSolicitar.textContent = isRequested ? "Solicitud enviada" : "Enviar solicitud";
+      btnSolicitar.disabled = isRequested;
+      */
+
+      // Mensajear: habilitar si ya hay solicitud enviada (simulación)
+      btnMensajear.setAttribute("aria-disabled", isRequested ? "false" : "true");
+      btnMensajear.classList.toggle("disabled", !isRequested);
+    }
+
+    // ====== Listeners ======
+    btnGuardar.addEventListener("click", ()=>{
+      const guardados = getArray(KEY_GUARDADOS);
+      const idx = guardados.indexOf(USER_ID);
+      if (idx === -1){ guardados.push(USER_ID); showToast("Candidato guardado.", "success"); }
+      else { guardados.splice(idx,1); showToast("Candidato quitado de guardados.", "info"); }
+      setArray(KEY_GUARDADOS, guardados);
+      syncButtons();
+    });
+
+    btnSolicitar.addEventListener("click", ()=>{
+      const solicitadas = getArray(KEY_SOLICITADAS);
+      if (!solicitadas.includes(USER_ID)){
+        solicitadas.push(USER_ID);
+        setArray(KEY_SOLICITADAS, solicitadas);
+        showToast("Solicitud enviada al candidato.", "success");
+        syncButtons();
+      }
+    });
+
+    // ====== Init ======
+    syncButtons();
+
+    // (Opcional) Si tuvieras un CV: btnVerCV.href = "ruta-al-cv.pdf"; btnVerCV.removeAttribute("aria-disabled");
   </script>
 </body>
 </html>
